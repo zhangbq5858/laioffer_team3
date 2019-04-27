@@ -1,0 +1,20 @@
+.home-select-btn {
+    position: relative;
+    height: 80px;
+    background: tomato;
+    border-radius: 8px;
+    margin-top: 200px;
+    text-align: center;
+}
+
+.home-select-btn span {
+    color: whitesmoke;
+    font-size: 30px;
+    font-weight: bold;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
