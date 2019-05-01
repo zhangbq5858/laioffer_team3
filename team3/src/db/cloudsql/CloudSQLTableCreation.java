@@ -29,6 +29,14 @@ public class CloudSQLTableCreation {
 			sql = "DROP TABLE IF EXISTS historys";
 			statement.executeUpdate(sql);
 			
+//			sql = "IF (OBJECT_ID('dbo.FK_RobotOrder', 'F') IS NOT NULL)\n" + 
+//					"BEGIN\n" + 
+//					"    ALTER TABLE dbo.robots DROP CONSTRAINT FK_RobotOrder\n" + 
+//					"END";
+//			statement.executeUpdate(sql);
+			
+			//TODO add double constraints between robot and order?
+			
 			sql = "DROP TABLE IF EXISTS orders";
 			statement.executeUpdate(sql);
 			
@@ -81,8 +89,12 @@ public class CloudSQLTableCreation {
 					+ "max_load INT,"
 					+ "speed INT,"
 					+ "endurance INT,"
+					+ "status VARCHAR(255) NOT NULL,"
+					+ "current_address_id VARCHAR(255),"
+					+ "current_order_id VARCHAR(255),"
 					+ "PRIMARY KEY (robot_id),"
-					+ "FOREIGN KEY (branch_id) REFERENCES branches(branch_id)"
+					+ "FOREIGN KEY (branch_id) REFERENCES branches(branch_id),"	
+					+ "FOREIGN KEY (current_address_id) REFERENCES addresses(address_id)"
 					+ ")";
 			statement.executeUpdate(sql);
 			
@@ -94,14 +106,22 @@ public class CloudSQLTableCreation {
 					+ "created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 					+ "updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 					+ "status VARCHAR(255),"
+					+ "price FLOAT,"
 					+ "receiver_email VARCHAR(255),"
 					+ "sender_email VARCHAR(255),"
+					+ "current_address_id VARCHAR(255),"
+					+ "expect_arrive_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
 					+ "PRIMARY KEY (order_id),"
 					+ "FOREIGN KEY (robot_id) REFERENCES robots(robot_id),"
 					+ "FOREIGN KEY (from_address_id) REFERENCES addresses(address_id),"
-					+ "FOREIGN KEY (to_address_id) REFERENCES addresses(address_id)"
+					+ "FOREIGN KEY (to_address_id) REFERENCES addresses(address_id),"
+					+ "FOREIGN KEY (current_address_id) REFERENCES addresses(address_id)"
 					+ ")";
 			statement.executeUpdate(sql);
+			
+//			sql = "ALTER TABLE robots "
+//					+ "ADD CONSTRAINT FK_RobotOrder"
+//					+ "ADD FOREIGN KEY (current_order_id) REFERENCES orders(order_id)";
 			
 			sql = "CREATE TABLE historys("
 					+ "user_id VARCHAR(255) NOT NULL,"
@@ -112,32 +132,7 @@ public class CloudSQLTableCreation {
 					+ ")";
 			statement.executeUpdate(sql);
 			
-			sql = "CREATE TABLE ordertracks("
-					+ "order_id VARCHAR(255) NOT NULL,"
-					+ "status VARCHAR(255),"
-					+ "expect_arrive_time TIMESTAMP,"
-					+ "created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-					+ "updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-					+ "current_address_id VARCHAR(255),"
-					+ "PRIMARY KEY (order_id),"
-					+ "FOREIGN KEY (order_id) REFERENCES orders(order_id),"
-					+ "FOREIGN KEY (current_address_id) REFERENCES addresses(address_id)"
-					+ ")";
-			statement.executeUpdate(sql);
 			
-			sql = "CREATE TABLE robottracks ("
-					+ "robot_id VARCHAR(255) NOT NULL,"
-					+ "status VARCHAR(255),"
-					+ "current_address_id VARCHAR(255),"
-					+ "current_order_id VARCHAR(255),"
-					+ "PRIMARY KEY (robot_id),"
-					+ "FOREIGN KEY (robot_id) REFERENCES robots(robot_id),"
-					+ "FOREIGN KEY (current_address_id) REFERENCES addresses(address_id),"
-					+ "FOREIGN KEY (current_order_id) REFERENCES orders(order_id)"
-					+ ")";
-			statement.executeUpdate(sql);
-
-
 
 			// Step 4: insert fake user 1111/3229c1097c00d497a0fd282d586be050
 			sql = "INSERT INTO users VALUES('1111', '3229c1097c00d497a0fd282d586be050', 'John', 'Smith', 'laioffer_team3@gamil.com')";
