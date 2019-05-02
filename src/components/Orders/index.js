@@ -9,13 +9,9 @@ import Payment from './Payment';
 const Step = Steps.Step;
 
 const steps = [{
-  title: 'Destination',
-  description: 'Enter destination info',
+  title: 'Destination & My Info',
+  description: 'Enter destination & My info',
   content: 'Destination-content',
-}, {
-  title: 'My Info',
-  description: 'Enter my info',
-  content: 'My Info-content',
 }, {
   title: 'Deliver Methods',
   description: 'Enter deliver methods',
@@ -31,6 +27,43 @@ class Orders extends Component {
     super(props);
     this.state = {
       current: 0,
+      to_address:{
+        fName:"",
+        lName:"",
+        street:"",
+        city:"",
+        state:"",
+        zipcode:"",
+        email:"",
+        phone:"",
+      },
+      from_address:{
+        fName:"",
+        lName:"",
+        street:"",
+        city:"",
+        state:"",
+        zipcode:"",
+        email:"",
+        phone:"",
+      },
+      //   to_fName:"",
+      //   to_lName:"",
+      //   to_street:"",
+      //   to_city:"",
+      //   to_state:"",
+      //   to_zipcode:"",
+      //   to_email:"",
+      //   to_phone:"",
+      //
+      //   from_fName:"",
+      //   from_lName:"",
+      //   from_street:"",
+      //   from_city:"",
+      //   from_state:"",
+      //   from_zipcode:"",
+      //   from_email:"",
+      //   from_phone:"",
     };
   }
 
@@ -43,8 +76,22 @@ class Orders extends Component {
     const current = this.state.current - 1;
     this.setState({ current });
   }
+
+  handleChange = input => event => {
+    if (input === "to_address.state" || input === "from_address.state") {
+      this.setState({ [input]: event });
+    } else {
+      this.setState({ [input]: event.target.value });
+    }
+  };
+
   render() {
+
+    // const { current, to_fName, to_lName, to_street, to_city, to_state, to_zipcode, to_email, to_phone, from_fName, from_lName, from_street, from_city, from_state, from_zipcode, from_email, from_phone} = this.state;
+    // const values = { to_fName, to_lName, to_street, to_city, to_state, to_zipcode, to_email, to_phone, from_fName, from_lName, from_street, from_city, from_state, from_zipcode, from_email, from_phone};
     const { current } = this.state;
+
+    console.log(this.state);
     return (
       <div>
         <Row type="flex" >
@@ -53,12 +100,16 @@ class Orders extends Component {
               {steps.map(item => <Step key={item.title} title={item.title} description={item.description}/>)}
             </Steps>
           </Col>
-          <Col span={7}>
+          <Col span={19}>
             <div className="steps-content">
-              {current === 0  && (<Destination/>)}
-              {current === 1  && (<MyInfo/>)}
-              {current === 2  && (<Deliver/>)}
-              {current === 3  && (<Payment/>)}
+              {/*{current === 0  && (<Destination handleChange={this.handleChange}/>)}*/}
+              {/*{current === 1  && (<MyInfo handleChange={this.handleChange}/>)}*/}
+              {/*{current === 2  && (<Deliver />)}*/}
+              {/*{current === 3  && (<Payment/>)}*/}
+
+              {current === 0  && (<Destination handleChange={this.handleChange}/>)}
+              {current === 1  && (<Deliver />)}
+              {current === 2  && (<Payment/>)}
             </div>
             <div className="steps-action">
               <Row type="flex" justify="center">

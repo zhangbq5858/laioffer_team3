@@ -3,10 +3,15 @@
     border-radius: 6px;
     background-color: #fafafa;
     min-height: 200px;
-    text-align: center;
-    padding-top: 80px;
+    text-align: left;
+    /*padding-top: 80px;*/
 }
 
 .steps-action {
     margin-top: 24px;
 }
+
+.form-wrapper {
+    padding: 24px
+}
+
