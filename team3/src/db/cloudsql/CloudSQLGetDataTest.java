@@ -13,7 +13,9 @@ public class CloudSQLGetDataTest {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		DataSource pool = CloudSQLConnection.createConnectionPool();
-		try (Connection conn = pool.getConnection()) {
+		Connection conn;
+		try  {
+			conn = pool.getConnection();
 			// Step 1 Connect to MySQL.
 			if (conn == null) {
 				return;

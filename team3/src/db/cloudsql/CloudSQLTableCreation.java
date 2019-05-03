@@ -7,11 +7,17 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import com.kenai.constantine.platform.WaitFlags;
+
+import jnr.ffi.Struct.int16_t;
+
 public class CloudSQLTableCreation {		
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		DataSource pool = CloudSQLConnection.createConnectionPool();
-		try (Connection conn = pool.getConnection()) {
+		Connection conn;
+		try  {
+			conn = pool.getConnection();
 			// Step 1 Connect to MySQL.
 			if (conn == null) {
 				return;
@@ -20,7 +26,10 @@ public class CloudSQLTableCreation {
 			// Step 2 drop old tables.
 			Statement statement = conn.createStatement();
 			
-			String sql = "DROP TABLE IF EXISTS robottracks";
+			String sql = "DROP TRIGGER IF EXISTS tr_Robots";
+			statement.executeUpdate(sql);
+			
+			sql = "DROP TABLE IF EXISTS robottracks";
 			statement.executeUpdate(sql);
 			
 			sql = "DROP TABLE IF EXISTS ordertracks";
@@ -36,6 +45,7 @@ public class CloudSQLTableCreation {
 //			statement.executeUpdate(sql);
 			
 			//TODO add double constraints between robot and order?
+			
 			
 			sql = "DROP TABLE IF EXISTS orders";
 			statement.executeUpdate(sql);
@@ -89,7 +99,7 @@ public class CloudSQLTableCreation {
 					+ "max_load INT,"
 					+ "speed INT,"
 					+ "endurance INT,"
-					+ "status VARCHAR(255) NOT NULL,"
+					+ "status VARCHAR(255) NOT NULL DEFAULT 'in branch',"
 					+ "current_address_id VARCHAR(255),"
 					+ "current_order_id VARCHAR(255),"
 					+ "PRIMARY KEY (robot_id),"
@@ -102,17 +112,17 @@ public class CloudSQLTableCreation {
 					+ "order_id VARCHAR(255) NOT NULL,"
 					+ "from_address_id VARCHAR(255) NOT NULL,"
 					+ "to_address_id VARCHAR(255) NOT NULL,"
-					+ "robot_id VARCHAR(255) NOT NULL,"
-					+ "created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-					+ "updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-					+ "status VARCHAR(255),"
+					+ "robot_id VARCHAR(255),"
+					+ "created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+					+ "updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+					+ "status VARCHAR(255) DEFAULT \"package waiting to be picked\" ,"
 					+ "price FLOAT,"
 					+ "receiver_email VARCHAR(255),"
 					+ "sender_email VARCHAR(255),"
 					+ "current_address_id VARCHAR(255),"
-					+ "expect_arrive_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+					+ "expect_arrive_time DATETIME DEFAULT CURRENT_TIMESTAMP,"
 					+ "PRIMARY KEY (order_id),"
-					+ "FOREIGN KEY (robot_id) REFERENCES robots(robot_id),"
+//					+ "FOREIGN KEY (robot_id) REFERENCES robots(robot_id),"
 					+ "FOREIGN KEY (from_address_id) REFERENCES addresses(address_id),"
 					+ "FOREIGN KEY (to_address_id) REFERENCES addresses(address_id),"
 					+ "FOREIGN KEY (current_address_id) REFERENCES addresses(address_id)"
@@ -132,12 +142,26 @@ public class CloudSQLTableCreation {
 					+ ")";
 			statement.executeUpdate(sql);
 			
+			//Step 4: create trigger on robot status to update order status automatically.
 			
-
-			// Step 4: insert fake user 1111/3229c1097c00d497a0fd282d586be050
-			sql = "INSERT INTO users VALUES('1111', '3229c1097c00d497a0fd282d586be050', 'John', 'Smith', 'laioffer_team3@gamil.com')";
+			sql = "CREATE TRIGGER  tr_Robot BEFORE UPDATE ON robots \n" + 
+					"FOR EACH ROW\n" + 
+					"BEGIN	\n" + 
+					"	IF NEW.current_order_id IS NOT NULL THEN\n" + 
+					"		IF NEW.status = \"picked\" THEN\n" + 
+					"			UPDATE orders SET status = \"package is on the way\", updated_time = CURRENT_TIMESTAMP WHERE order_id = NEW.current_order_id;\n" + 
+					"		END IF; \n" + 
+					"		IF New.status = 'received' THEN\n" + 
+					"			UPDATE orders SET status = 'package is received', updated_time = CURRENT_TIMESTAMP WHERE order_id = NEW.current_order_id;\n" + 
+					"		END IF; \n" + 
+					"	END IF;\n" + 
+					"END";
 			statement.executeUpdate(sql);
 
+
+			// Step 5: insert fake user 1111/3229c1097c00d497a0fd282d586be050
+			sql = "INSERT INTO users VALUES('1111', '3229c1097c00d497a0fd282d586be050', 'John', 'Smith', 'laioffer_team3@gamil.com')";
+			statement.executeUpdate(sql);
 
 			conn.close();
 			System.out.println("Import done successfully");
