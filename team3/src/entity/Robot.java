@@ -21,6 +21,10 @@ import com.google.api.client.util.Lists;
 
 
 import db.cloudsql.CloudSQLConnection;
+<<<<<<< HEAD
+=======
+import jnr.ffi.Struct.int16_t;
+>>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
 
 // robot 启动流程： addWord(order) -> beganWork(new Date() set time to began work, default immediately) 
 
@@ -40,6 +44,10 @@ public class Robot {
 	private Queue<Order> orders;
 	private String status;
 	private Order currentOrder;
+<<<<<<< HEAD
+=======
+	private int speed;
+>>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
 	
 	public static void main(String[] inputs) throws FileNotFoundException, IOException, InterruptedException, SQLException {
 	    Order order = new Order();
@@ -74,7 +82,11 @@ public class Robot {
 	
 	public void beganWork(Date beginDate) throws InterruptedException, FileNotFoundException, IOException, SQLException {
 		DataSource pool = CloudSQLConnection.createConnectionPool();
+<<<<<<< HEAD
 		Connection conn = pool.getConnection();
+=======
+		final Connection conn = pool.getConnection();
+>>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
 		Timer timer = new Timer(true);
 		TimerTask reporTask = new TimerTask() {
 			@Override
@@ -143,5 +155,25 @@ public class Robot {
 		// TODO send email to sender
 		
 	}
+<<<<<<< HEAD
+=======
+	
+	public int getSpeed() {
+		return this.speed;
+	}
+	
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+	
+	public String getRobotId() {
+		return this.robotId;
+	}
+	
+	public Address getAddress() {
+		//TODO: using coordinates to get address
+		return new Address.AddressBuilder().build();
+	}
+>>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
 
 }
