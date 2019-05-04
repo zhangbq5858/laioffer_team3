@@ -21,6 +21,7 @@ import com.google.api.client.util.Lists;
 
 
 import db.cloudsql.CloudSQLConnection;
+import jnr.ffi.Struct.int16_t;
 
 // robot 启动流程： addWord(order) -> beganWork(new Date() set time to began work, default immediately) 
 
@@ -40,6 +41,7 @@ public class Robot {
 	private Queue<Order> orders;
 	private String status;
 	private Order currentOrder;
+	private int speed;
 	
 	public static void main(String[] inputs) throws FileNotFoundException, IOException, InterruptedException, SQLException {
 	    Order order = new Order();
@@ -142,6 +144,23 @@ public class Robot {
 	private void remainderSender() {
 		// TODO send email to sender
 		
+	}
+	
+	public int getSpeed() {
+		return this.speed;
+	}
+	
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+	
+	public String getRobotId() {
+		return this.robotId;
+	}
+	
+	public Address getAddress() {
+		//TODO: using coordinates to get address
+		return new Address.AddressBuilder().build();
 	}
 
 }

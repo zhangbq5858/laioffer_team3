@@ -1,10 +1,16 @@
 package entity;
 
+import org.json.JSONObject;
+
 public class Address {
 	private String street;
 	private String city;
 	private String state;
 	private String zipcode;
+	
+	public Address(JSONObject address) {
+		
+	}
 	
 	public String getStreet() {
 		return street;
@@ -36,6 +42,15 @@ public class Address {
 
 	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
+	}
+	
+	public static Address parse(JSONObject obj) {
+		return new AddressBuilder()
+				.setStreet(obj.getString("street"))
+				.setCity(obj.getString("city"))
+				.setState(obj.getString("state"))
+				.setZipcode(obj.getString("zipcode"))
+				.build();
 	}
 	
 	private Address(AddressBuilder builder) {

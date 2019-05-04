@@ -2,6 +2,10 @@ package entity;
 
 
 public class Order {
+	public static final String STATUS_DELIVERED = "Delivered";
+	public static final String STATUS_ONWAY = "On the way";
+	public static final String STATUS_INITIAL = "Initialized";
+	
 	private String orderId;
 	private Integer pickPackageTime; //unit: minute
 	private Integer sendPackageTime; //unit: minute
