@@ -1,6 +1,7 @@
 @import '../../node_modules/antd/dist/antd.css';
 @import 'Home.css';
 @import 'Orders.css';
+@import 'Tracking.css';
 
 
 .App-logo {

@@ -28,8 +28,12 @@ class DestinationForm extends Component{
 
     return (
       <Fragment>
-        <h1>Enter your Destination Info</h1>
         <Form onSubmit={this.handleSubmit} className="form-wrapper">
+
+          <Form.Item
+          >
+            <h1>Enter your Destination Info</h1>
+          </Form.Item>
 
           <Form.Item
             style={{ marginBottom: 0 }}
@@ -205,8 +209,12 @@ class DestinationForm extends Component{
 
         </Form>
 
-        <h1>Enter your Info</h1>
         <Form onSubmit={this.handleSubmit} className="form-wrapper">
+
+          <Form.Item
+          >
+            <h1>Enter your Destination Info</h1>
+          </Form.Item>
 
           <Form.Item
             style={{ marginBottom: 0 }}
@@ -383,10 +391,7 @@ class DestinationForm extends Component{
           </Form.Item>
 
         </Form>
-
       </Fragment>
-
-
     );
   }
 }
