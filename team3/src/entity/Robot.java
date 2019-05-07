@@ -22,6 +22,7 @@ import com.google.api.client.util.Lists;
 
 import db.cloudsql.CloudSQLConnection;
 import jnr.ffi.Struct.int16_t;
+import org.json.JSONObject;
 
 // robot 启动流程： addWord(order) -> beganWork(new Date() set time to began work, default immediately) 
 
@@ -161,6 +162,18 @@ public class Robot {
 	public Address getAddress() {
 		//TODO: using coordinates to get address
 		return new Address.AddressBuilder().build();
+	}
+
+	public JSONObject toJSONObject() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("robotId", robotId);
+		jsonObject.put("interval_report_time", interval_report_time);
+		jsonObject.put("orders", orders);
+		jsonObject.put("status", status);
+		jsonObject.put("currentOrder", currentOrder);
+		jsonObject.put("speed", speed);
+
+		return jsonObject;
 	}
 
 }

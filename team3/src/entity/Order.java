@@ -79,4 +79,10 @@ public class Order {
         long currentTimeMillis = System.currentTimeMillis();
         return new UUID(currentTimeMillis, 1L + (long) (Math.random() * (10000L - 1L)));
     }
+
+    public void fakeOrder(Address fromAddress, Address toAddress) {
+        this.setOrderId(randOrderId().toString());
+        this.setFromAddress(fromAddress);
+        this.setToAddress(toAddress);
+    }
 }
