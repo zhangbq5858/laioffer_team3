@@ -118,3 +118,9 @@ public class Order {
         }
     }
 }
+//    public void fakeOrder(Address fromAddress, Address toAddress) {
+//        this.setOrderId(randOrderId().toString());
+//        this.setFromAddress(fromAddress);
+//        this.setToAddress(toAddress);
+//    }
+

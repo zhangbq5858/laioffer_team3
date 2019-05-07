@@ -15,6 +15,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.sql.DataSource;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
+
+import org.json.JSONObject;
+
 import com.google.api.client.util.Lists;
 import db.cloudsql.CloudSQLConnection;
 import util.EstimateTime;
@@ -161,5 +164,17 @@ public class Robot {
 		return new Address.AddressBuilder().build();
 	}
 	*/
+
+	public JSONObject toJSONObject() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("robotId", robotId);
+		jsonObject.put("interval_report_time", interval_report_time);
+		jsonObject.put("orders", orders);
+		jsonObject.put("status", status);
+		jsonObject.put("currentOrder", currentOrder);
+		jsonObject.put("speed", speed);
+
+		return jsonObject;
+	}
 
 }
