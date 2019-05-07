@@ -37,11 +37,11 @@ public class Track extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String orderId = request.getParameter("order_id");
-		DataSource pool = CloudSQLConnection.createConnectionPool();
+		
 		
 		try {
-			final Connection conn = pool.getConnection();
-			CloudSQLConnection cloudSQLConnection = new CloudSQLConnection(conn);
+			CloudSQLConnection cloudSQLConnection = new CloudSQLConnection();
+			final Connection conn = cloudSQLConnection.getConnection();
 			JSONObject status = cloudSQLConnection.getOrderStatus(orderId);
 			
 			JSONObject toAddress = status.getJSONObject("to_address");
@@ -49,11 +49,11 @@ public class Track extends HttpServlet {
 			
 			//getting current address from database
 			//TODO: in the future, will be get directly from robot itself
-			String robotId = status.getString("robot_id");
-			String currentAddressId = cloudSQLConnection.getAddressId(robotId);
+			Integer robotId = status.getInt("robot_id");
+			Integer currentAddressId = cloudSQLConnection.getAddressId(robotId);
 			JSONObject currentAddress = cloudSQLConnection.getAddress(currentAddressId);
 			Address current_address = Address.parse(currentAddress);
-			int speed = cloudSQLConnection.getSpeed(robotId);
+			Integer speed = cloudSQLConnection.getSpeed(robotId);
 			
 			status.put("current_address", currentAddress);
 			status.put("estimate_time", EstimateTime.estimateTime(current_address, to_address, speed));

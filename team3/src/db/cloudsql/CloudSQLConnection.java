@@ -1,5 +1,6 @@
 package db.cloudsql;
 
+
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.common.collect.Lists;
 import com.mysql.cj.conf.StringPropertyDefinition;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -20,6 +22,9 @@ import javax.sql.DataSource;
 
 import entity.Address;
 import entity.Order;
+import entity.Address.AddressBuilder;
+import jnr.ffi.Struct.int16_t;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,10 +45,15 @@ public class CloudSQLConnection {
     private static final String DB_USER = "root";
     private static final String DB_PASS = "root";
     private static final String DB_NAME = "team3";
-    private static final String JSON_PATH = "/Users/qiaozhu/Downloads/laioffer_team3-database/Around-27f2aa43fec3.json";
+    private static final String JSON_PATH = "/Users/boqunzhang/Downloads/laioffer/project/Around-27f2aa43fec3.json";
 
-    public CloudSQLConnection(Connection conn) {
-        this.conn = conn;
+    public Connection getConnection() {
+    	return this.conn;
+    }
+    
+    public CloudSQLConnection() throws FileNotFoundException, IOException, SQLException {
+    	DataSource pool = createConnectionPool(); 
+    	this.conn = pool.getConnection();
     }
 
     public static DataSource createConnectionPool() throws FileNotFoundException, IOException {
@@ -134,9 +144,9 @@ public class CloudSQLConnection {
 
             while (rs.next()) {
                 String status = rs.getString("status");
-                String from_address_id = rs.getString("from_address_id");
-                String to_address_id = rs.getString("to_address_id");
-                String robot_id = rs.getString("robot_id");
+                Integer from_address_id = rs.getInt("from_address_id");
+                Integer to_address_id = rs.getInt("to_address_id");
+                Integer robot_id = rs.getInt("robot_id");
 
                 JSONObject fromAddress = getAddress(from_address_id);
                 JSONObject toAddress = getAddress(to_address_id);
@@ -148,13 +158,11 @@ public class CloudSQLConnection {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        } 
         return obj;
     }
 
-    public JSONObject getAddress(String addressId) throws SQLException {
+    public JSONObject getAddress(Integer addressId) throws SQLException {
         if (conn == null)
             return null;
 
@@ -163,7 +171,7 @@ public class CloudSQLConnection {
         try {
             String sql = "SELECT * FROM addresses WHERE address_id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, addressId);
+            stmt.setInt(1, addressId);
 
             ResultSet rs = stmt.executeQuery();
 
@@ -175,76 +183,137 @@ public class CloudSQLConnection {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        } 
         return obj;
     }
 
-    public String getAddressId(String robotId) throws SQLException {
+    public Integer getAddressId(Integer robotId) throws SQLException {
         if (conn == null)
             return null;
-
-        String addressId = "";
+        
+        Integer addressId = null;
 
         try {
             String sql = "SELECT * FROM robots WHERE robot_id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, robotId);
+            stmt.setInt(1, robotId);
 
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                addressId = rs.getString("current_address_id");
+                addressId = rs.getInt("current_address_id");
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        } 
         return addressId;
     }
 
-    public int getSpeed(String robotId) throws SQLException, FileNotFoundException {
+    public int getSpeed(Integer robotId) throws SQLException, FileNotFoundException {
         if (conn == null)
             throw new FileNotFoundException("No connection to database");
-
         int speed = 0;
-
         try {
             String sql = "SELECT * FROM robots WHERE robot_id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, robotId);
-
+            stmt.setInt(1, robotId);
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
                 speed = rs.getInt("speed");
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        } 
         return speed;
     }
 
     // TODO: implement this method to create an address if not exists in database
-    public boolean createAddress() throws SQLException, FileNotFoundException {
-        return false;
+    public Integer createAddress(Address address) throws SQLException, FileNotFoundException {
+    	if (conn == null)
+    		throw new FileNotFoundException("No connection to database");
+        
+    	System.out.println("craete address");
+        Integer addressId = null;
+
+        try {
+            String sql = "INSERT IGNORE INTO addresses(street, city, state, zipcode) VALUES (?, ?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+//            stmt.setNull(1,Types.INTEGER);
+            stmt.setString(1, address.getStreet());
+            stmt.setString(2, address.getCity());
+            stmt.setString(3, address.getState());
+            stmt.setString(4, address.getZipcode());
+//            System.out.println("final command is " + stmt.toString());
+            stmt.execute();
+            
+            sql = "SELECT LAST_INSERT_ID();";
+            stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                addressId = rs.getInt("LAST_INSERT_ID()");
+            }
+            System.out.println("the newest address_id is: " + addressId);
+            
+            return addressId;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // TODO: implement this method to get available (key: branch_id, value: branch_address) pairs
     public Map<Integer, Address> getAvailBranches() throws SQLException, FileNotFoundException {
-        return new HashMap<>();
+    	Map<Integer, Address> map = new HashMap<>();
+    	if (conn == null)
+    		throw new FileNotFoundException("No connection to database");
+
+        try {
+            String sql = "SELECT * FROM branches";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                 Integer branchId = rs.getInt("branch_id");
+                 map.put(branchId, Address.parse(getAddress(rs.getInt("address_id"))));
+            }
+            return map;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+
+        return map;
     }
 
     // TODO: implement this method to create a fake order
-    public boolean createFakeOrder(Order o) throws SQLException, FileNotFoundException {
+    public boolean createOrder(Order order) throws SQLException, FileNotFoundException {
+    	if (conn == null)
+    		throw new FileNotFoundException("No connection to database");
+
+        try {
+        	// create from_address and to_address first;
+            int fromAddressId = createAddress(order.getFromAddress());
+            int toAddressId = createAddress(order.getToAddress());
+            
+            String sql = "INSERT INTO orders(order_id, from_address_id, to_address_id, receiver_email, "
+            		+ "sender_email) VALUES(?, ?, ?, ?, ?);";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, order.getOrderId().toString());
+            stmt.setInt(2, fromAddressId);
+            stmt.setInt(3, toAddressId);
+            stmt.setString(4, order.getReceiverEmail());
+            stmt.setString(5, order.getSenderEmail());
+            stmt.execute();
+            return true;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
         return false;
     }
 
-    // TODO: implement this method to update order by order_id
+    // TODO: implement this method to update order by order_id  ?? only update price time robotid?
     public boolean updateOrder(Order o) throws SQLException, FileNotFoundException {
         return false;
     }

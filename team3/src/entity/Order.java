@@ -3,42 +3,53 @@ package entity;
 
 import java.util.UUID;
 
+import org.json.JSONObject;
+
+import jnr.ffi.Struct.int16_t;
+
 public class Order {
     public static final String STATUS_DELIVERED = "Delivered";
     public static final String STATUS_ONWAY = "On the way";
     public static final String STATUS_INITIAL = "Initialized";
 
-    private String orderId;
-    private Integer pickPackageTime; //unit: minute
-    private Integer sendPackageTime; //unit: minute
+    private UUID orderId;
+//    private Integer pickPackageTime; //unit: minute
+//    private Integer sendPackageTime; //unit: minute
     private String senderEmail;
     private String receiverEmail;
     private Address fromAddress;
     private Address toAddress;
-
-    public String getOrderId() {
+    
+    
+    private Order(OrderBuilder builder) {
+    	this.orderId = Order.randOrderId();
+    	this.senderEmail = builder.senderEmail;
+    	this.receiverEmail = builder.receiverEmail;
+    	this.fromAddress = builder.fromAddress;
+    	this.toAddress = builder.toAddress;
+    }
+    
+    
+    public UUID getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
 
-    public Integer getPickPackageTime() {
-        return pickPackageTime;
-    }
-
-    public void setPickPackageTime(Integer pickPackageTime) {
-        this.pickPackageTime = pickPackageTime;
-    }
-
-    public Integer getSendPackageTime() {
-        return sendPackageTime;
-    }
-
-    public void setSendPackageTime(Integer sendPackageTime) {
-        this.sendPackageTime = sendPackageTime;
-    }
+//    public Integer getPickPackageTime() {
+//        return pickPackageTime;
+//    }
+//
+//    public void setPickPackageTime(Integer pickPackageTime) {
+//        this.pickPackageTime = pickPackageTime;
+//    }
+//
+//    public Integer getSendPackageTime() {
+//        return sendPackageTime;
+//    }
+//
+//    public void setSendPackageTime(Integer sendPackageTime) {
+//        this.sendPackageTime = sendPackageTime;
+//    }
 
     public String getSenderEmail() {
         return senderEmail;
@@ -79,5 +90,31 @@ public class Order {
         long currentTimeMillis = System.currentTimeMillis();
         return new UUID(currentTimeMillis, 1L + (long) (Math.random() * (10000L - 1L)));
     }
-
+    
+    public static class OrderBuilder {
+        private String senderEmail;
+        private String receiverEmail;
+        private Address fromAddress;
+        private Address toAddress;
+        
+        public OrderBuilder setSenderEmail(String senderEmail) {
+        	this.senderEmail = senderEmail;
+        	return this;
+        }
+        public OrderBuilder setReceiverEmail(String receiverEmail) {
+        	this.receiverEmail = receiverEmail;
+        	return this;
+        }
+        public OrderBuilder setFromAddress(Address fromAddress) {
+        	this.fromAddress = fromAddress;
+        	return this;
+        }
+        public OrderBuilder setToAddress(Address toAddress) {
+        	this.toAddress = toAddress;
+        	return this;
+        }
+        public Order build() {
+        	return new Order(this);
+        }
+    }
 }

@@ -9,15 +9,15 @@ import javax.sql.DataSource;
 
 import com.kenai.constantine.platform.WaitFlags;
 
+import entity.Order;
+import entity.Robot;
 import jnr.ffi.Struct.int16_t;
 
 public class CloudSQLTableCreation {		
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		DataSource pool = CloudSQLConnection.createConnectionPool();
-		Connection conn;
 		try  {
-			conn = pool.getConnection();
+			Connection conn = new CloudSQLConnection().getConnection();
 			// Step 1 Connect to MySQL.
 			if (conn == null) {
 				return;
@@ -75,7 +75,7 @@ public class CloudSQLTableCreation {
 			statement.executeUpdate(sql);
 			
 			sql = "CREATE TABLE addresses("
-					+ "address_id VARCHAR(255) NOT NULL,"
+					+ "address_id INT NOT NULL AUTO_INCREMENT,"
 					+ "street VARCHAR(255),"
 					+ "city VARCHAR(255),"
 					+ "state VARCHAR(255),"
@@ -85,22 +85,22 @@ public class CloudSQLTableCreation {
 			statement.executeUpdate(sql);
 			
 			sql = "CREATE TABLE branches("
-					+ "branch_id VARCHAR(255) NOT NULL,"
-					+ "address_id VARCHAR(255) NOT NULL,"
+					+ "branch_id INT NOT NULL AUTO_INCREMENT,"
+					+ "address_id INT NOT NULL,"
 					+ "PRIMARY KEY (branch_id),"
 					+ "FOREIGN KEY (address_id) REFERENCES addresses(address_id)"
 					+ ")";
 			statement.executeUpdate(sql);
 			
 			sql = "CREATE TABLE robots("
-					+ "robot_id VARCHAR(255) NOT NULL,"
-					+ "branch_id VARCHAR(255) NOT NULL,"
+					+ "robot_id INT NOT NULL AUTO_INCREMENT,"
+					+ "branch_id INT NOT NULL,"
 					+ "type VARCHAR(255) NOT NULL,"
 					+ "max_load INT,"
 					+ "speed INT,"
 					+ "endurance INT,"
-					+ "status VARCHAR(255) NOT NULL DEFAULT 'in branch',"
-					+ "current_address_id VARCHAR(255),"
+					+ "status VARCHAR(255) NOT NULL DEFAULT '" + Robot.IN_BRANCH + "',"
+					+ "current_address_id INT,"
 					+ "current_order_id VARCHAR(255),"
 					+ "PRIMARY KEY (robot_id),"
 					+ "FOREIGN KEY (branch_id) REFERENCES branches(branch_id),"	
@@ -110,16 +110,16 @@ public class CloudSQLTableCreation {
 			
 			sql = "CREATE TABLE orders("
 					+ "order_id VARCHAR(255) NOT NULL,"
-					+ "from_address_id VARCHAR(255) NOT NULL,"
-					+ "to_address_id VARCHAR(255) NOT NULL,"
-					+ "robot_id VARCHAR(255),"
+					+ "from_address_id INT NOT NULL,"
+					+ "to_address_id INT NOT NULL,"
+					+ "robot_id INT,"
 					+ "created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 					+ "updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-					+ "status VARCHAR(255) DEFAULT \"package waiting to be picked\" ,"
+					+ "status VARCHAR(255) DEFAULT \"" + Order.STATUS_INITIAL + "\" ,"
 					+ "price FLOAT,"
 					+ "receiver_email VARCHAR(255),"
 					+ "sender_email VARCHAR(255),"
-					+ "current_address_id VARCHAR(255),"
+					+ "current_address_id INT,"
 					+ "expect_arrive_time DATETIME DEFAULT CURRENT_TIMESTAMP,"
 					+ "PRIMARY KEY (order_id),"
 //					+ "FOREIGN KEY (robot_id) REFERENCES robots(robot_id),"
@@ -148,11 +148,11 @@ public class CloudSQLTableCreation {
 					"FOR EACH ROW\n" + 
 					"BEGIN	\n" + 
 					"	IF NEW.current_order_id IS NOT NULL THEN\n" + 
-					"		IF NEW.status = \"picked\" THEN\n" + 
-					"			UPDATE orders SET status = \"package is on the way\", updated_time = CURRENT_TIMESTAMP WHERE order_id = NEW.current_order_id;\n" + 
+					"		IF NEW.status = \"" + Robot.PICKED + "\" THEN\n" + 
+					"			UPDATE orders SET status = \"" + Order.STATUS_ONWAY + "\", updated_time = CURRENT_TIMESTAMP WHERE order_id = NEW.current_order_id;\n" + 
 					"		END IF; \n" + 
-					"		IF New.status = 'received' THEN\n" + 
-					"			UPDATE orders SET status = 'package is received', updated_time = CURRENT_TIMESTAMP WHERE order_id = NEW.current_order_id;\n" + 
+					"		IF New.status = '" + Robot.RECEIVED + "' THEN\n" + 
+					"			UPDATE orders SET status = '" + Order.STATUS_DELIVERED + "', updated_time = CURRENT_TIMESTAMP WHERE order_id = NEW.current_order_id;\n" + 
 					"		END IF; \n" + 
 					"	END IF;\n" + 
 					"END";

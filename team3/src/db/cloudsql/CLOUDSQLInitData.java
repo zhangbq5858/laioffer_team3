@@ -3,13 +3,19 @@ package db.cloudsql;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.sql.DataSource;
 
 public class CLOUDSQLInitData {
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static final String LAND_ROBOT = "land_robot";
+	public static final String UAV = "UAV";
+	
+	public static void initData() throws FileNotFoundException, IOException {
 		DataSource pool = CloudSQLConnection.createConnectionPool();
 		Connection conn;
 		try  {
@@ -18,6 +24,7 @@ public class CLOUDSQLInitData {
 			if (conn == null) {
 				return;
 			}
+			
 			Statement statement = conn.createStatement();
 			String sql;
 			
@@ -26,28 +33,70 @@ public class CLOUDSQLInitData {
 		
 			sql = "DELETE FROM orders";
 			statement.executeUpdate(sql);
+			
 			sql = "DELETE FROM robots";
 			statement.executeUpdate(sql);
+			sql = "ALTER TABLE robots AUTO_INCREMENT = 0";
+			statement.executeUpdate(sql);
+			
 			sql = "DELETE FROM branches";
 			statement.executeUpdate(sql);
+			sql = "ALTER TABLE branches AUTO_INCREMENT = 0";
+			statement.executeUpdate(sql);
+			
 			sql = "DELETE FROM addresses";
+			statement.executeUpdate(sql);
+			sql = "ALTER TABLE addresses AUTO_INCREMENT = 0";
 			statement.executeUpdate(sql);
 			
 			// Step 5: insert fake data
-			sql = "INSERT INTO addresses VALUES('1','12504 SE', 'Seattle', 'WA', '98109')";
+			sql = "INSERT INTO addresses VALUES(null, '429 Castro St', 'San Francisco', 'CA', '94114')";
 			statement.executeUpdate(sql);
-			sql = "INSERT INTO branches VALUES('1', '1')";
+			sql = "INSERT INTO addresses VALUES(null, '735 College Ave', 'Kentfield', 'CA', '94904')";
 			statement.executeUpdate(sql);
-			sql = "INSERT INTO robots(robot_id, branch_id, type) VALUES('1', '1', 'land_robot')";
+			sql = "INSERT INTO addresses VALUES(null, '1254 Davis St', 'San Leandro', 'CA', '94577')";
 			statement.executeUpdate(sql);
-			sql = "INSERT INTO orders(order_id, from_address_id, to_address_id) VALUES('1', '1', '1')";
+			sql = "INSERT INTO branches VALUES(null, 1)";
 			statement.executeUpdate(sql);
-
+			sql = "INSERT INTO branches VALUES(null, 2)";
+			statement.executeUpdate(sql);
+			sql = "INSERT INTO branches VALUES(null, 3)";
+			statement.executeUpdate(sql);
+			insertRobotData(conn);
+			
 			conn.close();
 			System.out.println("Import done successfully");
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static void insertRobotData(Connection conn) throws SQLException {
+		// 200 land_robot	
+		int lrNumber = 200;
+		String sql = "INSERT INTO robots(branch_id, type) VALUES(?, ?)";
+		PreparedStatement ps = conn.prepareStatement(sql);
+		ps.setString(2, LAND_ROBOT);
+		for(int i = 0; i < lrNumber; i++) {
+			int branch_id = (int)(Math.random() * 3) + 1;
+			ps.setInt(1, branch_id);
+			ps.executeUpdate();
+		}
+		//100 UAV
+		int uNumber =  100;
+		sql = "INSERT INTO robots(branch_id, type, speed) VALUES(?, ?, ?)";
+		ps = conn.prepareStatement(sql);
+		ps.setString(2, UAV);
+		ps.setInt(3, 40);
+		for(int i = lrNumber; i < lrNumber + uNumber; i++) {
+			int branch_id = (int)(Math.random() * 3) + 1;
+			ps.setInt(1, branch_id);
+			ps.executeUpdate();
+		}
+	}
+	
+	public static void main(String[] a) throws FileNotFoundException, IOException {
+		initData();
 	}
 }

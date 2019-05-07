@@ -13,18 +13,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.sql.DataSource;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
-
 import com.google.api.client.util.Lists;
-
-
 import db.cloudsql.CloudSQLConnection;
-<<<<<<< HEAD
-=======
-import jnr.ffi.Struct.int16_t;
->>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
+import util.EstimateTime;
 
 // robot 启动流程： addWord(order) -> beganWork(new Date() set time to began work, default immediately) 
 
@@ -39,16 +32,14 @@ public class Robot {
 	public static final String IN_BRANCH = "in branch";
 	
 	//TODO 所有时间单位暂时为ms 便与测试，之后下需要改为分钟
-	private String robotId;
+	private int robotId;
 	private int interval_report_time; 
 	private Queue<Order> orders;
 	private String status;
 	private Order currentOrder;
-<<<<<<< HEAD
-=======
 	private int speed;
->>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
-	
+	//TODO private Address currentAddress;
+	/*
 	public static void main(String[] inputs) throws FileNotFoundException, IOException, InterruptedException, SQLException {
 	    Order order = new Order();
 	    order.setOrderId("1");
@@ -82,11 +73,7 @@ public class Robot {
 	
 	public void beganWork(Date beginDate) throws InterruptedException, FileNotFoundException, IOException, SQLException {
 		DataSource pool = CloudSQLConnection.createConnectionPool();
-<<<<<<< HEAD
-		Connection conn = pool.getConnection();
-=======
 		final Connection conn = pool.getConnection();
->>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
 		Timer timer = new Timer(true);
 		TimerTask reporTask = new TimerTask() {
 			@Override
@@ -101,7 +88,7 @@ public class Robot {
 			Order currentOrder = orders.poll();
 			setCurrentOrder(currentOrder);
 			setStatus(PICKING);
-			Thread.sleep(currentOrder.getPickPackageTime());
+			Thread.sleep(EstimateTime.estimateTime(getAddress(), getAddress(), speed)());
 			remainderSender();
 			setStatus(PICKED);
 			report(conn);
@@ -155,8 +142,7 @@ public class Robot {
 		// TODO send email to sender
 		
 	}
-<<<<<<< HEAD
-=======
+
 	
 	public int getSpeed() {
 		return this.speed;
@@ -174,6 +160,6 @@ public class Robot {
 		//TODO: using coordinates to get address
 		return new Address.AddressBuilder().build();
 	}
->>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
+	*/
 
 }

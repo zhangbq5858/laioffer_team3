@@ -1,23 +1,16 @@
 package entity;
 
-<<<<<<< HEAD
-=======
 import org.json.JSONObject;
-
->>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
 public class Address {
 	private String street;
 	private String city;
 	private String state;
 	private String zipcode;
-	
-<<<<<<< HEAD
-=======
+
 	public Address(JSONObject address) {
 		
 	}
-	
->>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
+
 	public String getStreet() {
 		return street;
 	}
@@ -50,8 +43,7 @@ public class Address {
 		this.zipcode = zipcode;
 	}
 	
-<<<<<<< HEAD
-=======
+
 	public static Address parse(JSONObject obj) {
 		return new AddressBuilder()
 				.setStreet(obj.getString("street"))
@@ -60,19 +52,14 @@ public class Address {
 				.setZipcode(obj.getString("zipcode"))
 				.build();
 	}
-	
->>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
+
 	private Address(AddressBuilder builder) {
 		this.street = builder.street;
 		this.city = builder.city;
 		this.state = builder.state;
 		this.zipcode = builder.zipcode;
 	}
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> ef89b10b3436908de9ade7cc0f1417865186f5a0
 	public static class AddressBuilder{
 		private String street;
 		private String city;
