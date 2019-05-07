@@ -140,8 +140,6 @@ class Orders extends Component {
                 </Col>
               </Row>
 
-
-
             </div>
           </Col>
         </Row>
