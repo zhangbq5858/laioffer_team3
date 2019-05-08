@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.json.JSONObject;
 
-import jnr.ffi.Struct.int16_t;
 
 public class Order {
     public static final String STATUS_DELIVERED = "Delivered";

@@ -15,15 +15,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import entity.Address;
 import entity.Order;
+import entity.Robot;
 import entity.Address.AddressBuilder;
 import jnr.ffi.Struct.int16_t;
+import util.DistanceUtils;
+import util.GeoLocation;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -263,6 +268,27 @@ public class CloudSQLConnection {
     }
 
     // TODO: implement this method to get available (key: branch_id, value: branch_address) pairs
+    public JSONObject getBranchAddress(int branch_id) throws SQLException, FileNotFoundException {
+    	if (conn == null)
+    		throw new FileNotFoundException("No connection to database");
+
+        try {
+            String sql = "SELECT address_id FROM branches WHERE branch_id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, branch_id);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                 return  getAddress(rs.getInt("address_id"));
+            }
+            return null;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+
+        return null;
+    }
+    
     public Map<Integer, Address> getAvailBranches() throws SQLException, FileNotFoundException {
     	Map<Integer, Address> map = new HashMap<>();
     	if (conn == null)
@@ -284,6 +310,41 @@ public class CloudSQLConnection {
         } 
 
         return map;
+    }
+    
+    // implement this method to get all available robot with input type among all branches
+    public List<Integer> getAvailRobotIds(String robotType) throws SQLException, FileNotFoundException {
+    	Integer avaRobotsInAllBranch = null;
+    	return getAvailRobotIds(robotType, avaRobotsInAllBranch);
+    }
+    // implement this method to get all available robot with input type in branch with branch_id
+    public List<Integer> getAvailRobotIds(String robotType, Integer branch_id) throws SQLException, FileNotFoundException {
+    	List<Integer> robotIds = new ArrayList<Integer>();
+    	if (conn == null)
+    		throw new FileNotFoundException("No connection to database");
+
+        try {
+            String sql = "SELECT robot_id FROM robots WHERE status = ? AND type = ? ";
+            if(branch_id != null) {
+            	sql += " AND branch_id = ? ";
+            }
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            if(branch_id != null) {
+            	stmt.setInt(3, branch_id);
+            }
+            stmt.setString(1, Robot.IN_BRANCH);
+            stmt.setString(2, robotType);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                 robotIds.add(rs.getInt("robot_id"));
+            }
+            return robotIds;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        return null;
     }
 
     // TODO: implement this method to create a fake order
@@ -315,6 +376,37 @@ public class CloudSQLConnection {
 
     // TODO: implement this method to update order by order_id  ?? only update price time robotid?
     public boolean updateOrder(Order o) throws SQLException, FileNotFoundException {
+        return false;
+    }
+    
+    // TODO: implement this method to complement robot information with input robot. 
+    public boolean complementRobot(Robot robot) throws SQLException, FileNotFoundException {
+    	if (conn == null)
+    		throw new FileNotFoundException("No connection to database");
+
+        try {
+        	// create from_address and to_address first;
+            int robot_id = robot.getRobotId();
+            String sql = "SELECT * from robots where robot_id = ?;";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, robot_id);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	System.out.println("complementing robot...");
+            	robot.setType(rs.getString("type"));
+            	if(robot.getType().equals(Robot.UAV)) {
+            		robot.setSpeed(rs.getInt("speed"));
+            	}
+            	robot.setBranchAddress(Address.parse(getBranchAddress(rs.getInt("branch_id"))));
+            	GeoLocation location = DistanceUtils.getGeocode(robot.getBranchAddress());
+                robot.setCurrentGeoLocation(location);
+                return true;
+            }
+            return false;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
         return false;
     }
 }
