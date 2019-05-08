@@ -91,4 +91,9 @@ public class Address {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return "Street: " + street + ", City: " + city + ", State: " + state + ", Zipcode: " + zipcode;
+	}
+	
 }

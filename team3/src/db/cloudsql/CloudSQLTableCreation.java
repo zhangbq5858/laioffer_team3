@@ -100,11 +100,11 @@ public class CloudSQLTableCreation {
 					+ "speed INT,"
 					+ "endurance INT,"
 					+ "status VARCHAR(255) NOT NULL DEFAULT '" + Robot.IN_BRANCH + "',"
-					+ "current_address_id INT,"
 					+ "current_order_id VARCHAR(255),"
+					+ "current_lat DOUBLE,"
+					+ "current_lng DOUBLE,"
 					+ "PRIMARY KEY (robot_id),"
-					+ "FOREIGN KEY (branch_id) REFERENCES branches(branch_id),"	
-					+ "FOREIGN KEY (current_address_id) REFERENCES addresses(address_id)"
+					+ "FOREIGN KEY (branch_id) REFERENCES branches(branch_id)"	
 					+ ")";
 			statement.executeUpdate(sql);
 			
@@ -119,13 +119,11 @@ public class CloudSQLTableCreation {
 					+ "price FLOAT,"
 					+ "receiver_email VARCHAR(255),"
 					+ "sender_email VARCHAR(255),"
-					+ "current_address_id INT,"
 					+ "expect_arrive_time DATETIME DEFAULT CURRENT_TIMESTAMP,"
 					+ "PRIMARY KEY (order_id),"
 //					+ "FOREIGN KEY (robot_id) REFERENCES robots(robot_id),"
 					+ "FOREIGN KEY (from_address_id) REFERENCES addresses(address_id),"
-					+ "FOREIGN KEY (to_address_id) REFERENCES addresses(address_id),"
-					+ "FOREIGN KEY (current_address_id) REFERENCES addresses(address_id)"
+					+ "FOREIGN KEY (to_address_id) REFERENCES addresses(address_id)"
 					+ ")";
 			statement.executeUpdate(sql);
 			

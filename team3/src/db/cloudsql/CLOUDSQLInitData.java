@@ -10,16 +10,16 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import entity.Robot;
+
 public class CLOUDSQLInitData {
 	
-	public static final String LAND_ROBOT = "land_robot";
-	public static final String UAV = "UAV";
+
 	
 	public static void initData() throws FileNotFoundException, IOException {
-		DataSource pool = CloudSQLConnection.createConnectionPool();
-		Connection conn;
 		try  {
-			conn = pool.getConnection();
+			CloudSQLConnection cloudSQLConnection =  new CloudSQLConnection();
+			Connection conn = cloudSQLConnection.getConnection();
 			// Step 1 Connect to MySQL.
 			if (conn == null) {
 				return;
@@ -50,11 +50,11 @@ public class CLOUDSQLInitData {
 			statement.executeUpdate(sql);
 			
 			// Step 5: insert fake data
-			sql = "INSERT INTO addresses VALUES(null, '429 Castro St', 'San Francisco', 'CA', '94114')";
+			sql = "INSERT INTO addresses VALUES(null, '429CastroSt', 'SanFrancisco', 'CA', '94114')";
 			statement.executeUpdate(sql);
-			sql = "INSERT INTO addresses VALUES(null, '735 College Ave', 'Kentfield', 'CA', '94904')";
+			sql = "INSERT INTO addresses VALUES(null, '735CollegeAve', 'Kentfield', 'CA', '94904')";
 			statement.executeUpdate(sql);
-			sql = "INSERT INTO addresses VALUES(null, '1254 Davis St', 'San Leandro', 'CA', '94577')";
+			sql = "INSERT INTO addresses VALUES(null, '1254DavisSt', 'SanLeandro', 'CA', '94577')";
 			statement.executeUpdate(sql);
 			sql = "INSERT INTO branches VALUES(null, 1)";
 			statement.executeUpdate(sql);
@@ -77,7 +77,7 @@ public class CLOUDSQLInitData {
 		int lrNumber = 200;
 		String sql = "INSERT INTO robots(branch_id, type) VALUES(?, ?)";
 		PreparedStatement ps = conn.prepareStatement(sql);
-		ps.setString(2, LAND_ROBOT);
+		ps.setString(2, Robot.LAND_ROBOT);
 		for(int i = 0; i < lrNumber; i++) {
 			int branch_id = (int)(Math.random() * 3) + 1;
 			ps.setInt(1, branch_id);
@@ -87,7 +87,7 @@ public class CLOUDSQLInitData {
 		int uNumber =  100;
 		sql = "INSERT INTO robots(branch_id, type, speed) VALUES(?, ?, ?)";
 		ps = conn.prepareStatement(sql);
-		ps.setString(2, UAV);
+		ps.setString(2, Robot.UAV);
 		ps.setInt(3, 40);
 		for(int i = lrNumber; i < lrNumber + uNumber; i++) {
 			int branch_id = (int)(Math.random() * 3) + 1;
