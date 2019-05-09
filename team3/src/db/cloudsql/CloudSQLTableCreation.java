@@ -3,6 +3,7 @@ package db.cloudsql;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.sql.DataSource;
@@ -16,8 +17,9 @@ import jnr.ffi.Struct.int16_t;
 public class CloudSQLTableCreation {		
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
+		Connection conn = new CloudSQLConnection().getConnection();
 		try  {
-			Connection conn = new CloudSQLConnection().getConnection();
+			
 			// Step 1 Connect to MySQL.
 			if (conn == null) {
 				return;
@@ -166,6 +168,13 @@ public class CloudSQLTableCreation {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
 		}
 	}
 

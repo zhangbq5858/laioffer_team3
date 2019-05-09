@@ -17,8 +17,9 @@ public class CLOUDSQLInitData {
 
 	
 	public static void initData() throws FileNotFoundException, IOException {
+		CloudSQLConnection cloudSQLConnection =  new CloudSQLConnection();
 		try  {
-			CloudSQLConnection cloudSQLConnection =  new CloudSQLConnection();
+			
 			Connection conn = cloudSQLConnection.getConnection();
 			// Step 1 Connect to MySQL.
 			if (conn == null) {
@@ -69,6 +70,8 @@ public class CLOUDSQLInitData {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			cloudSQLConnection.close();
 		}
 	}
 	

@@ -1,16 +1,19 @@
 package db.cloudsql;
 
-
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.common.collect.Lists;
 import com.mysql.cj.conf.StringPropertyDefinition;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,7 +29,6 @@ import entity.Address;
 import entity.Order;
 import entity.Robot;
 import entity.Address.AddressBuilder;
-import jnr.ffi.Struct.int16_t;
 import util.DistanceUtils;
 import util.GeoLocation;
 
@@ -56,29 +58,64 @@ public class CloudSQLConnection {
     	return this.conn;
     }
     
-    public CloudSQLConnection() throws FileNotFoundException, IOException, SQLException {
-    	DataSource pool = createConnectionPool(); 
-    	this.conn = pool.getConnection();
+    public CloudSQLConnection() {
+    	try {
+        	String envValue = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+            System.out.print("system env: " + envValue);
+            File file = new File("/download/Around-27f2aa43fec3.json"); 
+            BufferedReader br = new BufferedReader(new FileReader(file)); 
+            
+            String st; 
+            while ((st = br.readLine()) != null) {
+              System.out.println(st); 
+            } 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	    try {
+	    	DataSource pool = createConnectionPool(); 
+	    	this.conn = pool.getConnection();
+	    } catch (Exception e) {
+	      e.printStackTrace();
+	    }
     }
 
-    public static DataSource createConnectionPool() throws FileNotFoundException, IOException {
+    public static DataSource createConnectionPool() throws FileNotFoundException, IOException, ClassNotFoundException {
         // [START cloud_sql_mysql_servlet_create]
         // The configuration object specifies behaviors for the connection pool.
         HikariConfig config = new HikariConfig();
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(JSON_PATH))
                 .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
-        // Configure which instance and what database user to connect with.
-        config.setJdbcUrl(String.format("jdbc:mysql:///%s", DB_NAME));
+//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        
+//         Configure which instance and what database user to connect with.
+         
+        config.setJdbcUrl(String.format("jdbc:mysql://google/%s", DB_NAME));
         config.setUsername(DB_USER); // e.g. "root", "postgres"
         config.setPassword(DB_PASS); // e.g. "my-password"
 
         // For Java users, the Cloud SQL JDBC Socket Factory can provide authenticated
         // connections.
+        
+       // jdbc:mysql://google/<DATABASE_NAME>?cloudSqlInstance=<INSTANCE_CONNECTION_NAME>&
+        //socketFactory=com.google.cloud.sql.mysql.SocketFactory&useSSL=false&user=<MYSQL_USER_NAME>
+        //&password=<MYSQL_USER_PASSWORD>
+        
+        
         // See https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory for
         // details.
+        
+//        config.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource");
+//        config.addDataSourceProperty("url", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+        
+        //The CloudSQL driver class name is: "com.mysql.jdbc.GoogleDriver". You are using: "com.google.cloud.sql.jdbc.Driver".
+        
         config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
+//        config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.jdbc.Driver");
         config.addDataSourceProperty("cloudSqlInstance", CLOUD_SQL_CONNECTION_NAME);
         config.addDataSourceProperty("useSSL", "false");
+//        Class.forName("com.google.cloud.sql.jdbc.Driver");
 
         // ... Specify additional connection properties here.
         // [START_EXCLUDE]
@@ -379,7 +416,7 @@ public class CloudSQLConnection {
         return false;
     }
     
-    // TODO: implement this method to complement robot information with input robot. 
+    // TODO: implement this method to complement robot information(type, branch_id, geolocation) with input robot. 
     public boolean complementRobot(Robot robot) throws SQLException, FileNotFoundException {
     	if (conn == null)
     		throw new FileNotFoundException("No connection to database");
@@ -408,5 +445,49 @@ public class CloudSQLConnection {
             e.printStackTrace();
         } 
         return false;
+    }
+    
+    public boolean deleteOrder(String orderId) throws FileNotFoundException {
+    	if (conn == null)
+    		throw new FileNotFoundException("No connection to database");
+
+        try {
+        	// create from_address and to_address first;
+            String sql = "DELEE FROM orders where order_id = ?;";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, orderId);
+            return stmt.execute();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        return false;
+    }
+    
+    public boolean confirmOrder(JSONObject robotObject, String orderId) {
+
+        try {
+        	// create from_address and to_address first;
+            String sql = "UPDATE orders SET robot_id = ?, price = ? WHERE order_id = ?;";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, robotObject.getInt("robot_id"));
+            stmt.setDouble(2, robotObject.getDouble("price"));
+            stmt.setString(3, orderId);
+            return stmt.execute();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        return false;
+    }
+    
+    public void close() {
+	    if (conn != null) {
+		     try {
+		      this.conn.close();
+		     } catch (Exception e) {
+		      e.printStackTrace();
+		     }
+		    }
     }
 }

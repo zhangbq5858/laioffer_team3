@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 public class CloudSQLGetDataTest {
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException {
 		DataSource pool = CloudSQLConnection.createConnectionPool();
 		Connection conn;
 		try  {

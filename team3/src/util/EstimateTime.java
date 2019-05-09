@@ -14,13 +14,13 @@ public class EstimateTime {
 	public static double estimateTime(Address fromAddress, Address toAddress) {
 		//TODO
 		//Optimize in the future
-		return 10;
+		return 20;
 	}
 	
 	// TODO estimate time for land_robot in unit s;
 	public static double estimateTime(GeoLocation fromAddress, GeoLocation toAddress) {
 		//TODO
 		//Optimize in the future
-		return 10;
+		return 20;
 	}
 }

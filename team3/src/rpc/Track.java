@@ -47,6 +47,8 @@ public class Track extends HttpServlet {
 			JSONObject toAddress = status.getJSONObject("to_address");
 			Address to_address = Address.parse(toAddress);
 			
+			//TODO 添加判断条件，如果order已经delivered，则不需要后续的判断current address
+			
 			//getting current address from database
 			//TODO: in the future, will be get directly from robot itself
 			Integer robotId = status.getInt("robot_id");
@@ -68,7 +70,6 @@ public class Track extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

@@ -53,54 +53,50 @@ public class Robot {
 	private Address branchAddress;
 	private String type;
 	
-	private Connection conn;
+	private CloudSQLConnection cloudSQLConnection;
 	
 	
 	//TODO private Address currentAddress;
 	
 	public static void main(String[] inputs) throws FileNotFoundException, IOException, InterruptedException, SQLException {
-		JSONObject fromAddressJO = new JSONObject();
-		JSONObject toAddressJO = new JSONObject();
+//		JSONObject fromAddressJO = new JSONObject();
+//		JSONObject toAddressJO = new JSONObject();
+//		
+//		fromAddressJO.put("street", "2451DelmarDrE");
+//		fromAddressJO.put("city", "Seattle");
+//		fromAddressJO.put("state", "WA");
+//		fromAddressJO.put("zipcode", "98102");
+//		
+//
+//		toAddressJO.put("street", "124715thAveE");
+//		toAddressJO.put("city", "Seattle");
+//		toAddressJO.put("state", "WA");
+//		toAddressJO.put("zipcode", "98112");
+//
+//		Address fromAddress = Address.parse(fromAddressJO);
+//		Address toAddress = Address.parse(toAddressJO);
+//		
+//		
 		
-		fromAddressJO.put("street", "2451DelmarDrE");
-		fromAddressJO.put("city", "Seattle");
-		fromAddressJO.put("state", "WA");
-		fromAddressJO.put("zipcode", "98102");
-		
-
-		toAddressJO.put("street", "124715thAveE");
-		toAddressJO.put("city", "Seattle");
-		toAddressJO.put("state", "WA");
-		toAddressJO.put("zipcode", "98112");
-
-		Address fromAddress = Address.parse(fromAddressJO);
-		Address toAddress = Address.parse(toAddressJO);
-		
-		OrderBuilder orderBuilder = new OrderBuilder();
-		orderBuilder.setFromAddress(fromAddress);
-		orderBuilder.setToAddress(toAddress);
-		Order order = orderBuilder.build();
-		
-		CloudSQLConnection connection = new CloudSQLConnection();
-		connection.createOrder(order);
-		
-		List<Integer> availableRobots = connection.getAvailRobotIds(LAND_ROBOT);
-		if(availableRobots.size() > 0) {
-			Robot robot = new Robot(availableRobots.get(0), 5000);
-			robot.addWork(order);
-			robot.beganWork();
-		}
+//		CloudSQLConnection connection = new CloudSQLConnection();
+//		connection.createOrder(order);
+//		
+//		List<Integer> availableRobots = connection.getAvailRobotIds(LAND_ROBOT);
+//		if(availableRobots.size() > 0) {
+//			Robot robot = new Robot(availableRobots.get(0), 5000);
+//			robot.addWork(order);
+//			robot.beganWork();
+//		}
 	}
 	
 	//initialize robot with robot_id and interval_report_time.
 	public Robot(int robotId, int interval_report_time) throws FileNotFoundException, IOException, SQLException {
-		CloudSQLConnection connection = new CloudSQLConnection();
-	    this.conn = connection.getConnection();
+		this.cloudSQLConnection = new CloudSQLConnection();
 		this.robotId = robotId;
 		this.interval_report_time = interval_report_time;
 		orders = new LinkedList<>();
 		status = IN_BRANCH;
-		connection.complementRobot(this);
+		cloudSQLConnection.complementRobot(this);
 		System.out.println("finish creating robot with id: " + getRobotId());
 	}
 	
@@ -224,14 +220,14 @@ public class Robot {
 		Thread.sleep(timeInSecond * 1000);
 		setStatus(IN_BRANCH);
 		report();
+		cloudSQLConnection.close();
 	}
 
 	private void report() {
 		try {
 			// Step 1 Connect to MySQL.
-			if (conn == null) {
-				return;
-			}
+			
+			Connection conn = cloudSQLConnection.getConnection();
 			// read user data from table users;
 			String sql = "UPDATE robots SET status = ?, current_order_id = ?, "
 					+ "current_lat = ?, current_lng = ? "

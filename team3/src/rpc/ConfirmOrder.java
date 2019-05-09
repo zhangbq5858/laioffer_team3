@@ -1,6 +1,7 @@
 package rpc;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,18 +17,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import db.cloudsql.CloudSQLConnection;
+import entity.Address;
+import entity.Order;
+import entity.Order.OrderBuilder;
+import entity.Robot;
 
 /**
  * Servlet implementation class Order
  */
 @WebServlet("/confirmOrder")
-public class Order extends HttpServlet {
+public class ConfirmOrder extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Order() {
+    public ConfirmOrder() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -37,34 +42,54 @@ public class Order extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		DataSource pool = CloudSQLConnection.createConnectionPool();
-		
+		CloudSQLConnection cloudSQLConnection = new CloudSQLConnection();
 		try {
+			
+			
+			
 			JSONObject input = RpcHelper.readJSONObject(request);
+			
+			// select available robot and get robot_id
+			JSONObject robotJsonObject = input.getJSONObject("robot");
+			String type = robotJsonObject.getString("type");
+			Integer robotId = null;
+			while(true) {
+				List<Integer> availableRobots = cloudSQLConnection.getAvailRobotIds(type);
+				// if we have available robot, select the first one to work
+				if(availableRobots.size() > 0) {
+					robotId = availableRobots.get(0);
+					robotJsonObject.put("robot_id" , robotId);
+					break;
+				}
+				//if no available robot now sleep 10 minutes;
+				Thread.sleep(10 * 60 * 1000); 
+			}
+			
+			// update the information (robot_id, price) to order;
 			String orderId = input.getString("order_id");
+			cloudSQLConnection.confirmOrder(robotJsonObject, orderId);
 			
-			JSONArray robot = input.getJSONArray("robot");
-			String robot_id = robot.getString("robot_id");
-			Robot robot = new Robot(robot_id, 5000);
-			Order order = new Order();
-			//order.set
+			// monitor robot and assign order to it;
+			
+				//1. get from address and to address
+			JSONObject status = cloudSQLConnection.getOrderStatus(orderId);
+			Address fromAddress = Address.parse(status.getJSONObject("from_address"));
+			Address toAddress =  Address.parse(status.getJSONObject("to_address"));
+				//2.create order
+			OrderBuilder orderBuilder = new OrderBuilder();
+			orderBuilder.setFromAddress(fromAddress);
+			orderBuilder.setToAddress(toAddress);
+			Order order = orderBuilder.build();
+				//3. create robot and began work
+			Robot robot = new Robot(robotId, 5000);
 			robot.addWork(order);
-			String type = robot.getString("type");
-			// unit?
-			String time = robot.getString("time");
-			Integer price = input.getInt("price");
-			
-			final Connection conn = pool.getConnection();
-			CloudSQLConnection cloudSQLConnection = new CloudSQLConnection(conn);
-			
-			cloudSQLConnection.acceptOrder(orderId, robot.type, price);
+			robot.beganWork();
 			RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
 			
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-	  		 connection.close();
+	  		 cloudSQLConnection.close();
 	  	}
 	}
 
@@ -72,19 +97,17 @@ public class Order extends HttpServlet {
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		DataSource pool = CloudSQLConnection.createConnectionPool();
-		
+
+		CloudSQLConnection cloudSQLConnection = new CloudSQLConnection();
 		try {
 			JSONObject input = RpcHelper.readJSONObject(request);
 	  		String orderId = input.getString("order_id");
-	  		
-	  		connection.deleteOrder(orderId);
+	  		cloudSQLConnection.deleteOrder(orderId);
 	  		RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
 		} catch (Exception e) {
 			e.printStackTrace();
 	  	} finally {
-	  		connection.close();
+	  		cloudSQLConnection.close();
 	  	}	  		
 	}
 
