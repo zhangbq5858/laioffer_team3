@@ -11,7 +11,7 @@ public class Order {
     public static final String STATUS_ONWAY = "On the way";
     public static final String STATUS_INITIAL = "Initialized";
 
-    private UUID orderId;
+    private String orderId;
 //    private Integer pickPackageTime; //unit: minute
 //    private Integer sendPackageTime; //unit: minute
     private String senderEmail;
@@ -21,7 +21,7 @@ public class Order {
     
     
     private Order(OrderBuilder builder) {
-    	this.orderId = Order.randOrderId();
+    	this.orderId = builder.orderId == null ? Order.randOrderId().toString() : builder.orderId;
     	this.senderEmail = builder.senderEmail;
     	this.receiverEmail = builder.receiverEmail;
     	this.fromAddress = builder.fromAddress;
@@ -29,7 +29,7 @@ public class Order {
     }
     
     
-    public UUID getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
@@ -91,10 +91,16 @@ public class Order {
     }
     
     public static class OrderBuilder {
+    	private String orderId;
         private String senderEmail;
         private String receiverEmail;
         private Address fromAddress;
         private Address toAddress;
+        
+        public OrderBuilder setOrderId(String orderId) {
+        	this.orderId = orderId;
+        	return this;
+        }
         
         public OrderBuilder setSenderEmail(String senderEmail) {
         	this.senderEmail = senderEmail;

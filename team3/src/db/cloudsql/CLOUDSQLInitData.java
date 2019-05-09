@@ -10,6 +10,7 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import database.DBConnectionFactory;
 import entity.Robot;
 
 public class CLOUDSQLInitData {
@@ -17,10 +18,10 @@ public class CLOUDSQLInitData {
 
 	
 	public static void initData() throws FileNotFoundException, IOException {
-		CloudSQLConnection cloudSQLConnection =  new CloudSQLConnection();
+//		CloudSQLConnection cloudSQLConnection =  new CloudSQLConnection();
 		try  {
 			
-			Connection conn = cloudSQLConnection.getConnection();
+			Connection conn = new DBConnectionFactory().getConnection().getConnection();
 			// Step 1 Connect to MySQL.
 			if (conn == null) {
 				return;
@@ -70,9 +71,7 @@ public class CLOUDSQLInitData {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			cloudSQLConnection.close();
-		}
+		} 
 	}
 	
 	private static void insertRobotData(Connection conn) throws SQLException {

@@ -16,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import database.DBConnection;
+import database.DBConnectionFactory;
 import db.cloudsql.CloudSQLConnection;
 import entity.Address;
 import entity.Order;
@@ -42,7 +44,7 @@ public class ConfirmOrder extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		CloudSQLConnection cloudSQLConnection = new CloudSQLConnection();
+		DBConnection dbConnection = new DBConnectionFactory().getConnection();
 		try {
 			
 			
@@ -54,7 +56,7 @@ public class ConfirmOrder extends HttpServlet {
 			String type = robotJsonObject.getString("type");
 			Integer robotId = null;
 			while(true) {
-				List<Integer> availableRobots = cloudSQLConnection.getAvailRobotIds(type);
+				List<Integer> availableRobots = dbConnection.getAvailRobotIds(type);
 				// if we have available robot, select the first one to work
 				if(availableRobots.size() > 0) {
 					robotId = availableRobots.get(0);
@@ -67,18 +69,17 @@ public class ConfirmOrder extends HttpServlet {
 			
 			// update the information (robot_id, price) to order;
 			String orderId = input.getString("order_id");
-			cloudSQLConnection.confirmOrder(robotJsonObject, orderId);
+			dbConnection.confirmOrder(robotJsonObject, orderId);
 			
 			// monitor robot and assign order to it;
 			
 				//1. get from address and to address
-			JSONObject status = cloudSQLConnection.getOrderStatus(orderId);
+			JSONObject status = dbConnection.getOrderStatus(orderId);
 			Address fromAddress = Address.parse(status.getJSONObject("from_address"));
 			Address toAddress =  Address.parse(status.getJSONObject("to_address"));
 				//2.create order
-			OrderBuilder orderBuilder = new OrderBuilder();
-			orderBuilder.setFromAddress(fromAddress);
-			orderBuilder.setToAddress(toAddress);
+			OrderBuilder orderBuilder = new OrderBuilder().setOrderId(orderId).setFromAddress(fromAddress).setToAddress(toAddress);
+			
 			Order order = orderBuilder.build();
 				//3. create robot and began work
 			Robot robot = new Robot(robotId, 5000);
@@ -89,7 +90,7 @@ public class ConfirmOrder extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-	  		 cloudSQLConnection.close();
+			dbConnection.close();
 	  	}
 	}
 
@@ -98,16 +99,16 @@ public class ConfirmOrder extends HttpServlet {
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		CloudSQLConnection cloudSQLConnection = new CloudSQLConnection();
+		DBConnection dbConnection = new DBConnectionFactory().getConnection();
 		try {
 			JSONObject input = RpcHelper.readJSONObject(request);
 	  		String orderId = input.getString("order_id");
-	  		cloudSQLConnection.deleteOrder(orderId);
+	  		dbConnection.deleteOrder(orderId);
 	  		RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
 		} catch (Exception e) {
 			e.printStackTrace();
 	  	} finally {
-	  		cloudSQLConnection.close();
+	  		dbConnection.close();
 	  	}	  		
 	}
 

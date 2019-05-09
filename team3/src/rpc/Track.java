@@ -13,8 +13,11 @@ import javax.sql.DataSource;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import database.DBConnection;
+import database.DBConnectionFactory;
 import db.cloudsql.CloudSQLConnection;
 import entity.*;
+import util.DistanceUtils;
 import util.EstimateTime;
 
 /**
@@ -36,13 +39,14 @@ public class Track extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String orderId = request.getParameter("order_id");
+
 		
 		
 		try {
-			CloudSQLConnection cloudSQLConnection = new CloudSQLConnection();
-			final Connection conn = cloudSQLConnection.getConnection();
-			JSONObject status = cloudSQLConnection.getOrderStatus(orderId);
+			JSONObject input = RpcHelper.readJSONObject(request);
+			String orderId = input.getString("order_id");
+			DBConnection dbConnection = new DBConnectionFactory().getConnection();
+			JSONObject status = dbConnection.getOrderStatus(orderId);
 			
 			JSONObject toAddress = status.getJSONObject("to_address");
 			Address to_address = Address.parse(toAddress);
@@ -52,13 +56,12 @@ public class Track extends HttpServlet {
 			//getting current address from database
 			//TODO: in the future, will be get directly from robot itself
 			Integer robotId = status.getInt("robot_id");
-			Integer currentAddressId = cloudSQLConnection.getAddressId(robotId);
-			JSONObject currentAddress = cloudSQLConnection.getAddress(currentAddressId);
-			Address current_address = Address.parse(currentAddress);
-			Integer speed = cloudSQLConnection.getSpeed(robotId);
+			//TODO get address by use robot geolocation to calculate the Address
+//			Address current_address = DistanceUtils.g(currentAddress);
+			Integer speed = dbConnection.getSpeed(robotId);
 			
-			status.put("current_address", currentAddress);
-			status.put("estimate_time", EstimateTime.estimateTime(current_address, to_address, speed));
+//			status.put("current_address", currentAddress);
+//			status.put("estimate_time", EstimateTime.estimateTime(current_address, to_address, speed));
 			
 			RpcHelper.writeJsonObject(response, status);
 		} catch (Exception e) {

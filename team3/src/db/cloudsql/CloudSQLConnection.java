@@ -6,6 +6,8 @@ import com.mysql.cj.conf.StringPropertyDefinition;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import database.DBConnection;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CloudSQLConnection {
+public class CloudSQLConnection implements DBConnection{
 
     private Connection conn;
 //	  private static final Logger LOGGER = Logger.getLogger(IndexServlet.class.getName());
@@ -59,19 +61,20 @@ public class CloudSQLConnection {
     }
     
     public CloudSQLConnection() {
-    	try {
+//    	try {
+    		//http://localhost:8080/download/Around-27f2aa43fec3.json
         	String envValue = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-            System.out.print("system env: " + envValue);
-            File file = new File("/download/Around-27f2aa43fec3.json"); 
-            BufferedReader br = new BufferedReader(new FileReader(file)); 
-            
-            String st; 
-            while ((st = br.readLine()) != null) {
-              System.out.println(st); 
-            } 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//            System.out.print("system env: " + envValue);
+//            File file = new File(envValue); 
+//            BufferedReader br = new BufferedReader(new FileReader(file)); 
+//            
+//            String st; 
+//            while ((st = br.readLine()) != null) {
+//              System.out.println(st); 
+//            } 
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 	    try {
 	    	DataSource pool = createConnectionPool(); 
@@ -87,10 +90,9 @@ public class CloudSQLConnection {
         HikariConfig config = new HikariConfig();
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(JSON_PATH))
                 .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
-//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         
 //         Configure which instance and what database user to connect with.
-         
+
         config.setJdbcUrl(String.format("jdbc:mysql://google/%s", DB_NAME));
         config.setUsername(DB_USER); // e.g. "root", "postgres"
         config.setPassword(DB_PASS); // e.g. "my-password"
@@ -171,9 +173,7 @@ public class CloudSQLConnection {
         return pool;
     }
 
-    public JSONObject getOrderStatus(String orderId) throws SQLException {
-        if (conn == null)
-            return null;
+    public JSONObject getOrderStatus(String orderId){
 
         JSONObject obj = new JSONObject();
 
@@ -204,10 +204,7 @@ public class CloudSQLConnection {
         return obj;
     }
 
-    public JSONObject getAddress(Integer addressId) throws SQLException {
-        if (conn == null)
-            return null;
-
+    public JSONObject getAddress(Integer addressId){
         JSONObject obj = new JSONObject();
 
         try {
@@ -229,10 +226,8 @@ public class CloudSQLConnection {
         return obj;
     }
 
-    public Integer getAddressId(Integer robotId) throws SQLException {
-        if (conn == null)
-            return null;
-        
+    public Integer getAddressId(Integer robotId){
+
         Integer addressId = null;
 
         try {
@@ -251,11 +246,12 @@ public class CloudSQLConnection {
         return addressId;
     }
 
-    public int getSpeed(Integer robotId) throws SQLException, FileNotFoundException {
-        if (conn == null)
-            throw new FileNotFoundException("No connection to database");
+    public int getSpeed(Integer robotId){
+
         int speed = 0;
         try {
+            if (conn == null)
+                throw new FileNotFoundException("No connection to database");
             String sql = "SELECT * FROM robots WHERE robot_id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, robotId);
@@ -270,14 +266,12 @@ public class CloudSQLConnection {
     }
 
     // TODO: implement this method to create an address if not exists in database
-    public Integer createAddress(Address address) throws SQLException, FileNotFoundException {
-    	if (conn == null)
-    		throw new FileNotFoundException("No connection to database");
-        
-    	System.out.println("craete address");
-        Integer addressId = null;
-
+    public Integer createAddress(Address address){
         try {
+        	if (conn == null)
+        		throw new FileNotFoundException("No connection to database");
+        	System.out.println("craete address");
+            Integer addressId = null;
             String sql = "INSERT IGNORE INTO addresses(street, city, state, zipcode) VALUES (?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
 //            stmt.setNull(1,Types.INTEGER);
@@ -305,11 +299,10 @@ public class CloudSQLConnection {
     }
 
     // TODO: implement this method to get available (key: branch_id, value: branch_address) pairs
-    public JSONObject getBranchAddress(int branch_id) throws SQLException, FileNotFoundException {
-    	if (conn == null)
-    		throw new FileNotFoundException("No connection to database");
-
+    public JSONObject getBranchAddress(int branch_id){
         try {
+        	if (conn == null)
+        		throw new FileNotFoundException("No connection to database");
             String sql = "SELECT address_id FROM branches WHERE branch_id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, branch_id);
@@ -326,12 +319,11 @@ public class CloudSQLConnection {
         return null;
     }
     
-    public Map<Integer, Address> getAvailBranches() throws SQLException, FileNotFoundException {
+    public Map<Integer, Address> getAvailBranches(){
     	Map<Integer, Address> map = new HashMap<>();
-    	if (conn == null)
-    		throw new FileNotFoundException("No connection to database");
-
         try {
+        	if (conn == null)
+        		throw new FileNotFoundException("No connection to database");
             String sql = "SELECT * FROM branches";
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
@@ -350,17 +342,17 @@ public class CloudSQLConnection {
     }
     
     // implement this method to get all available robot with input type among all branches
-    public List<Integer> getAvailRobotIds(String robotType) throws SQLException, FileNotFoundException {
+    public List<Integer> getAvailRobotIds(String robotType){
     	Integer avaRobotsInAllBranch = null;
     	return getAvailRobotIds(robotType, avaRobotsInAllBranch);
     }
     // implement this method to get all available robot with input type in branch with branch_id
-    public List<Integer> getAvailRobotIds(String robotType, Integer branch_id) throws SQLException, FileNotFoundException {
+    public List<Integer> getAvailRobotIds(String robotType, Integer branch_id){
     	List<Integer> robotIds = new ArrayList<Integer>();
-    	if (conn == null)
-    		throw new FileNotFoundException("No connection to database");
 
         try {
+        	if (conn == null)
+        		throw new FileNotFoundException("No connection to database");
             String sql = "SELECT robot_id FROM robots WHERE status = ? AND type = ? ";
             if(branch_id != null) {
             	sql += " AND branch_id = ? ";
@@ -385,11 +377,11 @@ public class CloudSQLConnection {
     }
 
     // TODO: implement this method to create a fake order
-    public boolean createOrder(Order order) throws SQLException, FileNotFoundException {
-    	if (conn == null)
-    		throw new FileNotFoundException("No connection to database");
+    public boolean createOrder(Order order){
 
         try {
+        	if (conn == null)
+        		throw new FileNotFoundException("No connection to database");
         	// create from_address and to_address first;
             int fromAddressId = createAddress(order.getFromAddress());
             int toAddressId = createAddress(order.getToAddress());
@@ -411,17 +403,13 @@ public class CloudSQLConnection {
         return false;
     }
 
-    // TODO: implement this method to update order by order_id  ?? only update price time robotid?
-    public boolean updateOrder(Order o) throws SQLException, FileNotFoundException {
-        return false;
-    }
     
     // TODO: implement this method to complement robot information(type, branch_id, geolocation) with input robot. 
-    public boolean complementRobot(Robot robot) throws SQLException, FileNotFoundException {
-    	if (conn == null)
-    		throw new FileNotFoundException("No connection to database");
+    public boolean complementRobot(Robot robot) {
 
         try {
+        	if (conn == null)
+        		throw new FileNotFoundException("No connection to database");
         	// create from_address and to_address first;
             int robot_id = robot.getRobotId();
             String sql = "SELECT * from robots where robot_id = ?;";
@@ -447,11 +435,10 @@ public class CloudSQLConnection {
         return false;
     }
     
-    public boolean deleteOrder(String orderId) throws FileNotFoundException {
-    	if (conn == null)
-    		throw new FileNotFoundException("No connection to database");
-
+    public boolean deleteOrder(String orderId) {
         try {
+        	if (conn == null)
+        		throw new FileNotFoundException("No connection to database");
         	// create from_address and to_address first;
             String sql = "DELEE FROM orders where order_id = ?;";
             PreparedStatement stmt = conn.prepareStatement(sql);

@@ -20,6 +20,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import database.DBConnection;
+import database.DBConnectionFactory;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -50,7 +53,7 @@ public class CreateOrder extends HttpServlet {
 		orderBuilder.setToAddress(to_address);
 		Order order = orderBuilder.build();
 
-		CloudSQLConnection connection = new CloudSQLConnection();
+		DBConnection dbConnection = new DBConnectionFactory().getConnection();
         try {
         	
         	
@@ -58,13 +61,13 @@ public class CreateOrder extends HttpServlet {
             // TODO: insert this order into order table @ database
             // CloudSQLConnection.insertFakeOrder(fake_order);
             System.out.println("inserting fake order to db...");
-    		connection.createOrder(order);
+            dbConnection.createOrder(order);
 
             // 4. check whether have available robot from db and write back to frontend
             JSONArray robots_json = new JSONArray();
         	
             // if we have available landrobot in branch:
-            if(connection.getAvailRobotIds(Robot.LAND_ROBOT).size() > 0) {
+            if(dbConnection.getAvailRobotIds(Robot.LAND_ROBOT).size() > 0) {
             	JSONObject object = new JSONObject();
             	double time = EstimateTime.estimateTime(from_address, to_address);
             	object.put("type", Robot.LAND_ROBOT);
@@ -73,7 +76,7 @@ public class CreateOrder extends HttpServlet {
             	robots_json.put(object);
             }
             
-            if(connection.getAvailRobotIds(Robot.UAV).size() > 0) {
+            if(dbConnection.getAvailRobotIds(Robot.UAV).size() > 0) {
             	JSONObject object = new JSONObject();
             	double time = EstimateTime.estimateTime(from_address, to_address);
             	object.put("type", Robot.UAV);
@@ -93,7 +96,7 @@ public class CreateOrder extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-        	connection.close();
+        	dbConnection.close();
         }
     }
 

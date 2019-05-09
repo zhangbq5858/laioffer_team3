@@ -20,6 +20,9 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
 import org.json.JSONObject;
 
 import com.google.api.client.util.Lists;
+
+import database.DBConnection;
+import database.DBConnectionFactory;
 import db.cloudsql.CloudSQLConnection;
 import entity.Order.OrderBuilder;
 import util.DistanceUtils;
@@ -53,7 +56,7 @@ public class Robot {
 	private Address branchAddress;
 	private String type;
 	
-	private CloudSQLConnection cloudSQLConnection;
+	private DBConnection dbConnection;
 	
 	
 	//TODO private Address currentAddress;
@@ -91,12 +94,12 @@ public class Robot {
 	
 	//initialize robot with robot_id and interval_report_time.
 	public Robot(int robotId, int interval_report_time) throws FileNotFoundException, IOException, SQLException {
-		this.cloudSQLConnection = new CloudSQLConnection();
+		this.dbConnection = new DBConnectionFactory().getConnection();
 		this.robotId = robotId;
 		this.interval_report_time = interval_report_time;
 		orders = new LinkedList<>();
 		status = IN_BRANCH;
-		cloudSQLConnection.complementRobot(this);
+		dbConnection.complementRobot(this);
 		System.out.println("finish creating robot with id: " + getRobotId());
 	}
 	
@@ -188,7 +191,9 @@ public class Robot {
 		}
 		//set 10 minutes to go back
 		goBack();
+		reporTask.cancel();
 		timer.cancel();
+		dbConnection.close();
 	}
 	// TODO monitor geolocation changing
 	private void pickPackage() throws InterruptedException {
@@ -220,19 +225,18 @@ public class Robot {
 		Thread.sleep(timeInSecond * 1000);
 		setStatus(IN_BRANCH);
 		report();
-		cloudSQLConnection.close();
 	}
 
 	private void report() {
 		try {
 			// Step 1 Connect to MySQL.
 			
-			Connection conn = cloudSQLConnection.getConnection();
+			Connection conn = dbConnection.getConnection();
 			// read user data from table users;
 			String sql = "UPDATE robots SET status = ?, current_order_id = ?, "
 					+ "current_lat = ?, current_lng = ? "
 					+ " WHERE robot_id = ? ";
-//			System.out.println("robot update report with command ");
+			
 			PreparedStatement stmt = conn.prepareStatement(sql);
 			stmt.setString(1, getStatus());
 			if(getCurrentOrder() == null) {
@@ -243,6 +247,7 @@ public class Robot {
 			stmt.setDouble(3, getCurrentGeoLocation().getLat());
 			stmt.setDouble(4,  getCurrentGeoLocation().getLng());
 			stmt.setInt(5, getRobotId());
+			System.out.println("robot update report with command " + stmt.toString());
 			stmt.execute();
 			
 		} catch (Exception e) {
