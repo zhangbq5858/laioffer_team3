@@ -10,6 +10,8 @@ import Register from './Register';
 import logo from '../assets/images/logo.svg';
 
 import '../styles/App.css';
+import Deliver from "./Orders/Deliver";
+import Payment from "./Orders/Payment";
 
 const { Content, Footer, Header } = Layout;
 
@@ -42,6 +44,8 @@ class App extends Component {
                 <Switch>
                   <Route exact path="/" component={Home} />
                   <Route exact path="/orders" component={Orders} />
+                  <Route exact path="/deliver" component={Deliver} />
+                  <Route exact path="/pay" component={Payment} />
                   <Route exact path="/tracking" component={Tracking} />
                   <Route exact path="/login" component={Login} />
                   <Route exact path="/register" component={Register} />
