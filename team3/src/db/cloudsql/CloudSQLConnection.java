@@ -189,14 +189,14 @@ public class CloudSQLConnection implements DBConnection{
                 Integer from_address_id = rs.getInt("from_address_id");
                 Integer to_address_id = rs.getInt("to_address_id");
                 Integer robot_id = rs.getInt("robot_id");
+                String expectTime = rs.getDate("expect_arrive_time").toString();
 
-                JSONObject fromAddress = getAddress(from_address_id);
                 JSONObject toAddress = getAddress(to_address_id);
 
-                obj.put("status", status);
-                obj.put("robot_id", robot_id);
-                obj.put("from_address", fromAddress);
+                obj.put("order_status", status);
+                obj.put("robot_id", robot_id);               
                 obj.put("to_address", toAddress);
+                obj.put("expect_arrive_time", expectTime);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -244,6 +244,29 @@ public class CloudSQLConnection implements DBConnection{
             e.printStackTrace();
         } 
         return addressId;
+    }
+    
+    public JSONObject getCurrentGeoLocation(Integer robotId){
+
+        JSONObject currentGeo = new JSONObject();
+
+        try {
+            String sql = "SELECT * FROM robots WHERE robot_id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, robotId);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String lat = rs.getString("current_lat");
+                String lon = rs.getString("current_lng");
+                currentGeo.put("Lat", lat);
+                currentGeo.put("Lon", lon);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        return currentGeo;
     }
 
     public int getSpeed(Integer robotId){

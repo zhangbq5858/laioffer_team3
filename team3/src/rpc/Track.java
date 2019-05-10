@@ -48,21 +48,28 @@ public class Track extends HttpServlet {
 			DBConnection dbConnection = new DBConnectionFactory().getConnection();
 			JSONObject status = dbConnection.getOrderStatus(orderId);
 			
-			JSONObject toAddress = status.getJSONObject("to_address");
-			Address to_address = Address.parse(toAddress);
+			//delivered, put to_address as the current location
+			if (status.getString("order_status").equals(Order.STATUS_DELIVERED)) {
+				JSONObject toAddress = status.getJSONObject("to_address");
+				Address to_address = Address.parse(toAddress);
+				GeoLocation currentGeoLocation = DistanceUtils.getGeocode(to_address);
+				
+				JSONObject current_geo_location = new JSONObject();
+				current_geo_location.put("Lat", currentGeoLocation.getLat());
+				current_geo_location.put("Lon", currentGeoLocation.getLng());
+				status.put("current_geoLocation", current_geo_location);
+			}
+			//not delivered, fetch current geoLocation from robot table
+			else {
+				Integer robotId = status.getInt("robot_id");
+				//TODO get address by use robot geolocation to calculate the Address
+				JSONObject current_geo_location = dbConnection.getCurrentGeoLocation(robotId);
+				status.put("current_geoLocation", current_geo_location);
+			}
 			
-			//TODO 添加判断条件，如果order已经delivered，则不需要后续的判断current address
-			
-			//getting current address from database
-			//TODO: in the future, will be get directly from robot itself
-			Integer robotId = status.getInt("robot_id");
-			//TODO get address by use robot geolocation to calculate the Address
-//			Address current_address = DistanceUtils.g(currentAddress);
-			Integer speed = dbConnection.getSpeed(robotId);
-			
-//			status.put("current_address", currentAddress);
-//			status.put("estimate_time", EstimateTime.estimateTime(current_address, to_address, speed));
-			
+			status.remove("robot_id");
+			status.remove("to_address");
+			status.put("order_id", orderId);
 			RpcHelper.writeJsonObject(response, status);
 		} catch (Exception e) {
 			e.printStackTrace();
