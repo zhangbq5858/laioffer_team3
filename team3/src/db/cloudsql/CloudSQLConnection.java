@@ -500,4 +500,36 @@ public class CloudSQLConnection implements DBConnection{
 		     }
 		    }
     }
+
+	@Override
+	public JSONObject getRobotInformation(Integer robot_id) {
+        try {
+        	if (conn == null)
+        		throw new FileNotFoundException("No connection to database");
+        	// create from_address and to_address first;
+            String sql = "SELECT * from robots where robot_id = ?;";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, robot_id);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	JSONObject robot = new JSONObject();
+            	robot.put("robot_id", rs.getInt("robot_id"));
+            	robot.put("branch_id", rs.getInt("branch_id"));
+            	robot.put("type", rs.getString("type"));
+            	//robot.put("max_load", rs.getInt("max_load"));
+            	robot.put("speed", rs.getInt("speed"));
+            	robot.put("endurance", rs.getInt("endurance"));
+            	robot.put("status", rs.getString("status"));
+            	robot.put("current_order_id", rs.getString("current_order_id"));
+            	robot.put("current_lat", rs.getDouble("current_lat"));
+            	robot.put("current_lng", rs.getDouble("current_lng"));
+                return robot;
+            }
+            return null;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        return null;
+	}
 }

@@ -19,6 +19,7 @@ import db.cloudsql.CloudSQLConnection;
 import entity.*;
 import util.DistanceUtils;
 import util.EstimateTime;
+import util.GeoLocation;
 
 /**
  * Servlet implementation class Track
@@ -49,7 +50,7 @@ public class Track extends HttpServlet {
 			JSONObject status = dbConnection.getOrderStatus(orderId);
 			
 			//delivered, put to_address as the current location
-			if (status.getString("order_status").equals(Order.STATUS_DELIVERED)) {
+			if (status.getString("status").equals(Order.STATUS_DELIVERED)) {
 				JSONObject toAddress = status.getJSONObject("to_address");
 				Address to_address = Address.parse(toAddress);
 				GeoLocation currentGeoLocation = DistanceUtils.getGeocode(to_address);
@@ -63,7 +64,10 @@ public class Track extends HttpServlet {
 			else {
 				Integer robotId = status.getInt("robot_id");
 				//TODO get address by use robot geolocation to calculate the Address
-				JSONObject current_geo_location = dbConnection.getCurrentGeoLocation(robotId);
+				JSONObject robotInformation = dbConnection.getRobotInformation(robotId);
+				JSONObject current_geo_location = new JSONObject();
+				current_geo_location.put("current_lat", robotInformation.getDouble("current_lat"));
+				current_geo_location.put("current_lng", robotInformation.getDouble("current_lng"));
 				status.put("current_geoLocation", current_geo_location);
 			}
 			
