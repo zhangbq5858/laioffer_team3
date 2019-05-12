@@ -33,11 +33,14 @@ public class CreateOrder extends HttpServlet {
         // 1. get from_address and to_address
 //        String jsonString = IOUtils.toString(request.getInputStream(), "UTF-8");
 //        JSONObject jsonObject = new JSONObject(jsonString);
+    	response.setContentType("application/json");
+		response.setHeader("Access-Control-Allow-Origin", "*");
         JSONObject jsonObject = RpcHelper.readJSONObject(request);
         JSONObject from_address_json = null;
         Address from_address = null;
         JSONObject to_address_json = null;
         Address to_address = null;
+        System.out.println("createOrder get data: " + jsonObject);
         try {
             from_address_json = jsonObject.getJSONObject("from_address");
             from_address = Address.parse(from_address_json);
