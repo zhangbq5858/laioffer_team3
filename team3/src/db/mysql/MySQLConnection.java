@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import entity.GeoLocation;
 import org.json.JSONObject;
 
 import database.DBConnection;
@@ -17,7 +18,8 @@ import entity.Address;
 import entity.Order;
 import entity.Robot;
 import util.DistanceUtils;
-import util.GeoLocation;
+
+//import util.GeoLocation;
 
 public class MySQLConnection implements DBConnection{
 

@@ -1,6 +1,7 @@
 package util;
 
 import entity.Address;
+import entity.GeoLocation;
 
 public class EstimateTime {
 	public static double estimateTime(Address fromAddress, Address toAddress, int speed) {

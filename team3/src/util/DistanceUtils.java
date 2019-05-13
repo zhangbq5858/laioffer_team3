@@ -1,6 +1,7 @@
 package util;
 
 import entity.Address;
+import entity.GeoLocation;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

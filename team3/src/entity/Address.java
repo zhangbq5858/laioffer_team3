@@ -1,5 +1,6 @@
 package entity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 public class Address {
 	private String street;
@@ -44,7 +45,7 @@ public class Address {
 	}
 	
 
-	public static Address parse(JSONObject obj) {
+	public static Address parse(JSONObject obj) throws JSONException {
 		return new AddressBuilder()
 				.setStreet(obj.getString("street"))
 				.setCity(obj.getString("city"))

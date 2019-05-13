@@ -17,6 +17,7 @@ import java.util.TimerTask;
 import javax.sql.DataSource;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.api.client.util.Lists;
@@ -27,7 +28,7 @@ import db.cloudsql.CloudSQLConnection;
 import entity.Order.OrderBuilder;
 import util.DistanceUtils;
 import util.EstimateTime;
-import util.GeoLocation;
+//import util.GeoLocation;
 
 // robot 启动流程： addWord(order) -> beganWork(new Date() set time to began work, default immediately) 
 
@@ -271,7 +272,7 @@ public class Robot {
 	}
 	
 
-	public JSONObject toJSONObject() {
+	public JSONObject toJSONObject() throws JSONException {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("robotId", robotId);
 		jsonObject.put("interval_report_time", interval_report_time);
