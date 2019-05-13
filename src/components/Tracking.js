@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import axios from 'axios';
 import { Form, } from "antd";
 
 const mock_data = {
@@ -17,7 +18,14 @@ class Tracking extends Component{
     super(props);
   }
   componentDidMount() {
-
+    // axios
+    //   .get('/track')
+    //   .then(response => {
+    //     console.log(response)
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //   });
   }
 
   render() {
