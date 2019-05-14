@@ -35,9 +35,10 @@ public class DistanceUtils {
     public static double getDistance(Address fromAddress, Address toAddress) {
         double dist = 0;
 
-        String query = String.format("origins=%s,%s,%s&destinations=%s,%s,%s&key=%s",
-                fromAddress.getStreet(), fromAddress.getCity(), fromAddress.getState(),
-                toAddress.getStreet(), toAddress.getCity(), toAddress.getState(), API_KEY);
+        String query = String.format("origins=%s&destinations=%s&key=%s",
+                fromAddress.encode(),
+                toAddress.encode(),
+                API_KEY);
 
         // https://maps.googleapis.com/maps/api/distancematrix/json?origins=Vancouver+BC|Seattle&destinations=San+Francisco|Victoria+BC&mode=bicycling&language=fr-FR&key=YOUR_API_KEY
         String url = URL + DISTANCEMATRIX + OUTPUT_FORMAT + "?" + query;
@@ -119,8 +120,9 @@ public class DistanceUtils {
     public static GeoLocation getGeocode(Address address) {
         GeoLocation geoLoc = new GeoLocation();
 
-        String query = String.format("address=%s,%s,%s&key=%s",
-                address.getStreet(), address.getCity(), address.getState(), API_KEY);
+        String query = String.format("address=%s&key=%s",
+                address.encode(),
+                API_KEY);
 
         // https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
         String url = URL + GEOCODE + OUTPUT_FORMAT + "?" + query;
@@ -177,8 +179,8 @@ public class DistanceUtils {
     }
 
     public static void main(String[] args) {
-        Address fromAddress = new Address.AddressBuilder().setStreet("254DavisSt").setCity("Seattle").build();
-        Address toAddress = new Address.AddressBuilder().setCity("San+Francisco").build();
+        Address fromAddress = new Address.AddressBuilder().setStreet("254 Davis St").setCity("Seattle").build();
+        Address toAddress = new Address.AddressBuilder().setCity("San Francisco").build();
 
         System.out.println("Route Distance:");
         System.out.println(getDistance(fromAddress, toAddress));
