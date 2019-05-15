@@ -32,6 +32,72 @@ public class DistanceUtils {
      * @param toAddress
      * @return double: route dist (unit: meter)
      */
+    public static double[] getRouteDistanceAndTime(Address fromAddress, Address toAddress) {
+        double dist = 0;
+        double time = 0;
+
+        String query = String.format("origins=%s&destinations=%s&key=%s&mode=bicycling",
+                fromAddress.encode(),
+                toAddress.encode(),
+                API_KEY);
+
+        // https://maps.googleapis.com/maps/api/distancematrix/json?origins=Vancouver+BC|Seattle&destinations=San+Francisco|Victoria+BC&mode=bicycling&language=fr-FR&key=YOUR_API_KEY
+        String url = URL + DISTANCEMATRIX + OUTPUT_FORMAT + "?" + query;
+
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            System.out.println("Response Code: " + responseCode);
+
+            if (responseCode != 200) {
+                return new double[] {-1, -1}; // indicate fail
+            }
+
+            // read every 8k data
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            StringBuilder response = new StringBuilder();
+
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+
+            reader.close();
+            JSONObject object = new JSONObject(response.toString());
+
+            if (!object.isNull("rows")) {
+                JSONArray rows = object.getJSONArray("rows");
+                JSONObject row = rows.getJSONObject(0);
+
+                if (!row.isNull("elements")) {
+                    JSONArray elements = row.getJSONArray("elements");
+                    JSONObject element = elements.getJSONObject(0);
+
+                    if (!element.isNull("distance")) {
+                        JSONObject distance = element.getJSONObject("distance");
+                        dist = distance.getDouble("value");
+                    }
+
+                    if (!element.isNull("duration")) {
+                        JSONObject duration = element.getJSONObject("duration");
+                        time = duration.getDouble("value");
+                    }
+                }
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+
+        return new double[] {dist, time};
+    }
+
+    /**
+     * @param fromAddress
+     * @param toAddress
+     * @return double: route dist (unit: meter)
+     */
     public static double getDistance(Address fromAddress, Address toAddress) {
         double dist = 0;
 
