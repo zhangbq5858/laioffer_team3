@@ -1,5 +1,5 @@
-import React, { Component, Fragment } from 'react';
-import {  Route, Switch, Link } from 'react-router-dom';
+import React, { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import { Row, Col } from 'antd';
 import "../styles/Home.css";
 

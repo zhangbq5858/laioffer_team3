@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Steps, Button, Row, Col } from 'antd';
-import { Link, } from 'react-router-dom';
+import { Steps, Row, Col } from 'antd';
 import Destination from './Destination';
 import MyInfo from './MyInfo';
 import Deliver from './Deliver';
@@ -30,6 +29,8 @@ class Orders extends Component {
     super(props);
     this.state = {
       current: 0,
+      order_id: "",
+      robots: [],
       //   to_fName:"",
       //   to_lName:"",
       //   to_street:"",
@@ -65,6 +66,17 @@ class Orders extends Component {
     this.setState({ current: Number(page) });
   }
 
+  handleRobotInfo = (order_id, robots) => {
+    this.setState({
+      order_id,
+      robots,
+    })
+  }
+
+  getRobotInfo = () => {
+    return [this.state.order_id, this.state.robots];
+  }
+
   // handleChange = input => event => {
   //   if (input === "to_address.state" || input === "from_address.state") {
   //     this.setState({ [input]: event });
@@ -74,7 +86,6 @@ class Orders extends Component {
   // };
 
   render() {
-
     // const { current, to_fName, to_lName, to_street, to_city, to_state, to_zipcode, to_email, to_phone, from_fName, from_lName, from_street, from_city, from_state, from_zipcode, from_email, from_phone} = this.state;
     // const values = { to_fName, to_lName, to_street, to_city, to_state, to_zipcode, to_email, to_phone, from_fName, from_lName, from_street, from_city, from_state, from_zipcode, from_email, from_phone};
     const { current } = this.state;
@@ -93,42 +104,11 @@ class Orders extends Component {
           <Col span={19}>
             <div className="steps-content">
 
-              {current === 0  && (<Destination setPage={this.setPage}/>)}
-              {current === 1  && (<Deliver setPage={this.setPage}/>)}
+              {current === 0  && (<Destination setPage={this.setPage} handleRobotInfo={this.handleRobotInfo}/>)}
+              {current === 1  && (<Deliver setPage={this.setPage} getRobotInfo={this.getRobotInfo} history={this.props.history}/>)}
               {current === 2  && (<Success />)}
 
             </div>
-
-            {/*<div className="steps-action">*/}
-              {/*<Row type="flex" justify="center">*/}
-                {/*<Col span={12}>*/}
-                  {/*{*/}
-                    {/*current > 0*/}
-                    {/*&& (*/}
-                      {/*<Button onClick={() => this.prev()}>*/}
-                        {/*Back*/}
-                      {/*</Button>*/}
-                    {/*)*/}
-                  {/*}*/}
-                {/*</Col>*/}
-                {/*<Col span={12}>*/}
-                  {/*{*/}
-                    {/*current < steps.length - 1*/}
-                    {/*&& <Button type="primary" onClick={() => this.next()}>Next</Button>*/}
-                  {/*}*/}
-                  {/*{*/}
-                    {/*current === steps.length - 1*/}
-                    {/*&&*/}
-                    {/*<Button*/}
-                      {/*type="danger"*/}
-                    {/*>*/}
-                      {/*<Link to="/success">Make Order</Link>*/}
-                    {/*</Button>*/}
-                  {/*}*/}
-                {/*</Col>*/}
-              {/*</Row>*/}
-            {/*</div>*/}
-
           </Col>
         </Row>
 

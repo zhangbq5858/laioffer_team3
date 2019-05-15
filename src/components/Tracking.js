@@ -1,6 +1,7 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component, } from 'react';
 import axios from 'axios';
-import { Form, } from "antd";
+import { Form, Icon, Input, Button, } from 'antd';
+import {message} from 'antd/lib/index';
 
 const mock_data = {
   order_id: "1234567890987654321",
@@ -13,28 +14,49 @@ const mock_data = {
   }
 }
 
-class Tracking extends Component{
+class TrackingNum extends Component{
   constructor(props) {
     super(props);
+    this.state = {
+      fetch: false,
+      expect_arrive_time: "",
+      current_address: "",
+    }
   }
-  componentDidMount() {
-    // axios
-    //   .get('/track')
-    //   .then(response => {
-    //     console.log(response)
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //   });
-  }
+
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        const formData = new FormData();
+        formData.set('order_id', values.orderNum);
+        axios({
+          method: 'POST',
+          url:'/track',
+          data: formData,
+          config: { headers: {'Content-Type': 'multipart/form-data' }}
+        }).then(response => {
+          if (response.status === 200) {
+            this.setState({ fetch: true });
+          } else {
+            message.error("Wrong order number! Please check!");
+            this.setState({ fetch: false });
+          }
+          console.log(response);
+        }).catch(err => {
+          console.log(err);
+        });
+      }
+    });
+  };
 
   render() {
 
     const {current_address} = mock_data;
-
-    return(
-      <div>
-        <h1>Tracking Page</h1>
+    const { getFieldDecorator } = this.props.form;
+    let formUI;
+    if (this.state.fetch) {
+      formUI = (
         <Form>
           <Form.Item>
             <Form.Item style={{ display: 'inline-block', width: 'calc(30% - 12px)' }}>
@@ -63,9 +85,36 @@ class Tracking extends Component{
             </Form.Item>
           </Form.Item>
         </Form>
+      );
+    }
+
+    return(
+      <div>
+        <h1>Enter Your Order Id: </h1>
+        <Form onSubmit={this.handleSubmit} >
+          <Form.Item>
+            {getFieldDecorator('orderNum', {
+              rules: [{ required: true, message: 'Please input your order number!' }],
+            })(
+              <Input
+                prefix={<Icon type="barcode" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                placeholder="Order#"
+              />,
+            )}
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="login-form-button">
+              Search
+            </Button>
+          </Form.Item>
+        </Form>
+        
+        <div>{formUI}</div>
       </div>
     );
   }
 }
+
+const Tracking = Form.create()(TrackingNum);
 
 export default Tracking;
