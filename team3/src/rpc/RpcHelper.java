@@ -32,32 +32,44 @@ public class RpcHelper {
 	}
 
 	public static JSONObject readJSONObject(HttpServletRequest request) {
-		StringBuilder sBuilder = new StringBuilder();
 		try (BufferedReader reader = request.getReader()) {
-			String line = null;
-			JSONObject jsonObject = new JSONObject();
 			String key = null;
-			int count = 0;
-			while ((line = reader.readLine()) != null) {
-				System.out.println("rpc read data: " + line);
-				if(count == 1) {
-					key = line.split(";")[1].split("=")[1].split("\"")[1].trim();
-				} else if (count == 3) {
-					if(line.trim().charAt(0) == '{') {
-						jsonObject.put(key, new JSONObject(line));
-					} else {
-						jsonObject.put(key, line.trim());
-					}
-				}
-				count = (count + 1) % 4;
+			String line = reader.readLine();
+			if(line == null) {
+				return null;
 			}
-			return jsonObject;
-//			return new JSONObject(sBuilder.toString());
+			
+			if(line.charAt(0) == '{') {  // request from postman
+				StringBuilder sBuilder = new StringBuilder();
+				while(line != null) {
+					sBuilder.append(line);
+					line = reader.readLine();
+				}
+				return new JSONObject(sBuilder.toString());
+			} else { //request from front end
+				int count = 0;
+				JSONObject jsonObject = new JSONObject();
+				while(line != null) {
+					if(count == 1) {
+						key = line.split(";")[1].split("=")[1].split("\"")[1].trim();
+					} else if (count == 3) {
+						if(line.trim().charAt(0) == '{') {
+							jsonObject.put(key, new JSONObject(line));
+						} else {
+							jsonObject.put(key, line.trim());
+						}
+					}
+					count = (count + 1) % 4;
+					line = reader.readLine();
+				}
+				return jsonObject;
+			}
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return new JSONObject();
+		return null;
 	}
 }

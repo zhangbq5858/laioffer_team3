@@ -27,6 +27,9 @@ public class MySQLInitData {
 			
 			// Step 2 delete old datas in tables.
 		
+			sql = "DELETE FROM historys";
+			statement.executeUpdate(sql);
+			
 			sql = "DELETE FROM orders";
 			statement.executeUpdate(sql);
 			
