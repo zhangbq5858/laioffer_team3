@@ -33,8 +33,8 @@ public class CreateOrder extends HttpServlet {
         // 1. get from_address and to_address
 //        String jsonString = IOUtils.toString(request.getInputStream(), "UTF-8");
 //        JSONObject jsonObject = new JSONObject(jsonString);
-    	response.setContentType("application/json");
-		response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setContentType("application/json");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         JSONObject jsonObject = RpcHelper.readJSONObject(request);
         JSONObject from_address_json = null;
         Address from_address = null;
@@ -52,14 +52,14 @@ public class CreateOrder extends HttpServlet {
 
         // 2. create fake order
         OrderBuilder orderBuilder = new OrderBuilder();
-		orderBuilder.setFromAddress(from_address);
-		orderBuilder.setToAddress(to_address);
-		Order order = orderBuilder.build();
+        orderBuilder.setFromAddress(from_address);
+        orderBuilder.setToAddress(to_address);
+        Order order = orderBuilder.build();
 
-		DBConnection dbConnection = new DBConnectionFactory().getConnection();
+        DBConnection dbConnection = new DBConnectionFactory().getConnection();
         try {
-        	
-        	
+
+
             // 3. insert fake order to db
             // TODO: insert this order into order table @ database
             // CloudSQLConnection.insertFakeOrder(fake_order);
@@ -68,26 +68,26 @@ public class CreateOrder extends HttpServlet {
 
             // 4. check whether have available robot from db and write back to frontend
             JSONArray robots_json = new JSONArray();
-        	
+
             // if we have available landrobot in branch:
-            if(dbConnection.getAvailRobotIds(Robot.LAND_ROBOT).size() > 0) {
-            	JSONObject object = new JSONObject();
-            	double time = EstimateTime.estimateTime(from_address, to_address);
-            	object.put("type", Robot.LAND_ROBOT);
-            	object.put("time", time);
-            	object.put("price", PriceUtils.price(time, Robot.LAND_ROBOT));
-            	robots_json.put(object);
+            if (dbConnection.getAvailRobotIds(Robot.LAND_ROBOT).size() > 0) {
+                JSONObject object = new JSONObject();
+                double time = EstimateTime.estimateTime(from_address, to_address, Robot.LAND_ROBOT);
+                object.put("type", Robot.LAND_ROBOT);
+                object.put("time", time);
+                object.put("price", PriceUtils.price(time, Robot.LAND_ROBOT));
+                robots_json.put(object);
             }
-            
-            if(dbConnection.getAvailRobotIds(Robot.UAV).size() > 0) {
-            	JSONObject object = new JSONObject();
-            	double time = EstimateTime.estimateTime(from_address, to_address);
-            	object.put("type", Robot.UAV);
-            	object.put("time", time);
-            	object.put("price", PriceUtils.price(time, Robot.UAV));
-            	robots_json.put(object);
+
+            if (dbConnection.getAvailRobotIds(Robot.UAV).size() > 0) {
+                JSONObject object = new JSONObject();
+                double time = EstimateTime.estimateTime(from_address, to_address, Robot.UAV);
+                object.put("type", Robot.UAV);
+                object.put("time", time);
+                object.put("price", PriceUtils.price(time, Robot.UAV));
+                robots_json.put(object);
             }
-            
+
 
             JSONObject order_json = new JSONObject();
             order_json.put("order_id", order.getOrderId());
@@ -100,11 +100,11 @@ public class CreateOrder extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-        	dbConnection.close();
+            dbConnection.close();
         }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	doGet(request, response);
+        doGet(request, response);
     }
 }

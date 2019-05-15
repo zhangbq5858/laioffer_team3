@@ -1,6 +1,7 @@
 package util;
 
 import entity.Address;
+import util.GeoLocation;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,9 +35,10 @@ public class DistanceUtils {
     public static double getDistance(Address fromAddress, Address toAddress) {
         double dist = 0;
 
-        String query = String.format("origins=%s,%s,%s&destinations=%s,%s,%s&key=%s",
-                fromAddress.getStreet(), fromAddress.getCity(), fromAddress.getState(),
-                toAddress.getStreet(), toAddress.getCity(), toAddress.getState(), API_KEY);
+        String query = String.format("origins=%s&destinations=%s&key=%s",
+                fromAddress.encode(),
+                toAddress.encode(),
+                API_KEY);
 
         // https://maps.googleapis.com/maps/api/distancematrix/json?origins=Vancouver+BC|Seattle&destinations=San+Francisco|Victoria+BC&mode=bicycling&language=fr-FR&key=YOUR_API_KEY
         String url = URL + DISTANCEMATRIX + OUTPUT_FORMAT + "?" + query;
@@ -164,8 +166,9 @@ public class DistanceUtils {
     public static GeoLocation getGeocode(Address address) {
         GeoLocation geoLoc = new GeoLocation();
 
-        String query = String.format("address=%s,%s,%s&key=%s",
-                address.getStreet(), address.getCity(), address.getState(), API_KEY);
+        String query = String.format("address=%s&key=%s",
+                address.encode(),
+                API_KEY);
 
         // https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
         String url = URL + GEOCODE + OUTPUT_FORMAT + "?" + query;
@@ -223,8 +226,16 @@ public class DistanceUtils {
 
     public static void main(String[] args) {
     	getRoute();
-//        Address fromAddress = new Address.AddressBuilder().setStreet("254DavisSt").setCity("Seattle").build();
-//        Address toAddress = new Address.AddressBuilder().setCity("San+Francisco").build();
+        Address fromAddress = new Address.AddressBuilder().setStreet("254 Davis St").setCity("Seattle").build();
+        Address toAddress = new Address.AddressBuilder().setCity("San Francisco").build();
+
+        System.out.println("Route Distance:");
+        System.out.println(getDistance(fromAddress, toAddress));
+
+//        Address address = new Address.AddressBuilder().
+//                setStreet("1600+Amphitheatre+Parkway").
+//                setCity("Mountain+View").
+//                setState("CA").build();
 //
 //        System.out.println("Route Distance:");
 //        System.out.println(getDistance(fromAddress, toAddress));
@@ -257,4 +268,9 @@ public class DistanceUtils {
         // Response Code: 200
         // 1279596.824474498
     }
+
+	public static double[] getRouteDistanceAndTime(Address fromAddress, Address toAddress) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

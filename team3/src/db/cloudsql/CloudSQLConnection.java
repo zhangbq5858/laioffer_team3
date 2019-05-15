@@ -32,7 +32,8 @@ import entity.Order;
 import entity.Robot;
 import entity.Address.AddressBuilder;
 import util.DistanceUtils;
-import util.GeoLocation;
+//import util.GeoLocation;
+import entity.GeoLocation;
 
 import org.json.JSONArray;
 import org.json.JSONException;

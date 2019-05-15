@@ -29,8 +29,8 @@ import entity.Robot;
  */
 @WebServlet("/confirmOrder")
 public class ConfirmOrder extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
+    private static final long serialVersionUID = 1L;
+
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -39,77 +39,76 @@ public class ConfirmOrder extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		DBConnection dbConnection = new DBConnectionFactory().getConnection();
-		try {
-			
-			
-			
-			JSONObject input = RpcHelper.readJSONObject(request);
-			
-			// select available robot and get robot_id
-			JSONObject robotJsonObject = input.getJSONObject("robot");
-			String type = robotJsonObject.getString("type");
-			Integer robotId = null;
-			while(true) {
-				List<Integer> availableRobots = dbConnection.getAvailRobotIds(type);
-				// if we have available robot, select the first one to work
-				if(availableRobots.size() > 0) {
-					robotId = availableRobots.get(0);
-					robotJsonObject.put("robot_id" , robotId);
-					break;
-				}
-				//if no available robot now sleep 10 minutes;
-				Thread.sleep(10 * 60 * 1000); 
-			}
-			
-			// update the information (robot_id, price) to order;
-			String orderId = input.getString("order_id");
-			dbConnection.confirmOrder(robotJsonObject, orderId);
-			
-			// monitor robot and assign order to it;
-			
-				//1. get from address and to address
-			JSONObject status = dbConnection.getOrderStatus(orderId);
-			Address fromAddress = Address.parse(status.getJSONObject("from_address"));
-			Address toAddress =  Address.parse(status.getJSONObject("to_address"));
-				//2.create order
-			OrderBuilder orderBuilder = new OrderBuilder().setOrderId(orderId).setFromAddress(fromAddress).setToAddress(toAddress);
-			
-			Order order = orderBuilder.build();
-				//3. create robot and began work
-			Robot robot = new Robot(robotId, 5000);
-			robot.addWork(order);
-			robot.beganWork();
-			RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			dbConnection.close();
-	  	}
-	}
+    /**
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+     */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // TODO Auto-generated method stub
+        DBConnection dbConnection = new DBConnectionFactory().getConnection();
+        try {
 
-	/**
-	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
-	 */
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		DBConnection dbConnection = new DBConnectionFactory().getConnection();
-		try {
-			JSONObject input = RpcHelper.readJSONObject(request);
-	  		String orderId = input.getString("order_id");
-	  		dbConnection.deleteOrder(orderId);
-	  		RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
-		} catch (Exception e) {
-			e.printStackTrace();
-	  	} finally {
-	  		dbConnection.close();
-	  	}	  		
-	}
+            JSONObject input = RpcHelper.readJSONObject(request);
+
+            // select available robot and get robot_id
+            JSONObject robotJsonObject = input.getJSONObject("robot");
+            String type = robotJsonObject.getString("type");
+            Integer robotId = null;
+            while (true) {
+                List<Integer> availableRobots = dbConnection.getAvailRobotIds(type);
+                // if we have available robot, select the first one to work
+                if (availableRobots.size() > 0) {
+                    robotId = availableRobots.get(0);
+                    robotJsonObject.put("robot_id", robotId);
+                    break;
+                }
+                //if no available robot now sleep 10 minutes;
+                Thread.sleep(10 * 60 * 1000);
+            }
+
+            // update the information (robot_id, price) to order;
+            String orderId = input.getString("order_id");
+            dbConnection.confirmOrder(robotJsonObject, orderId);
+
+            // monitor robot and assign order to it;
+
+            //1. get from address and to address
+            JSONObject status = dbConnection.getOrderStatus(orderId);
+            Address fromAddress = Address.parse(status.getJSONObject("from_address"));
+            Address toAddress = Address.parse(status.getJSONObject("to_address"));
+            //2.create order
+            OrderBuilder orderBuilder = new OrderBuilder().setOrderId(orderId).setFromAddress(fromAddress).setToAddress(toAddress);
+
+            Order order = orderBuilder.build();
+            //3. create robot and began work
+            Robot robot = new Robot(robotId, 5000);
+            robot.addWork(order);
+            robot.beganWork();
+            RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.close();
+        }
+    }
+
+    /**
+     * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
+     */
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        DBConnection dbConnection = new DBConnectionFactory().getConnection();
+        try {
+            JSONObject input = RpcHelper.readJSONObject(request);
+            String orderId = input.getString("order_id");
+            dbConnection.deleteOrder(orderId);
+            RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.close();
+        }
+    }
 
 }
