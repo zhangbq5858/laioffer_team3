@@ -94,6 +94,7 @@ public class CreateOrder extends HttpServlet {
             order_json.put("distance", DistanceUtils.getStraightDistance(from_address, to_address));
             order_json.put("robots", robots_json);
             order_json.put("price", 10);
+           
 
             RpcHelper.writeJsonObject(response, order_json);
         } catch (Exception e) {
