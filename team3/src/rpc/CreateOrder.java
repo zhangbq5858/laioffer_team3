@@ -72,7 +72,7 @@ public class CreateOrder extends HttpServlet {
             // if we have available landrobot in branch:
             if (dbConnection.getAvailRobotIds(Robot.LAND_ROBOT).size() > 0) {
                 JSONObject object = new JSONObject();
-                double time = EstimateTime.estimateTime(from_address, to_address);
+                double time = EstimateTime.estimateTime(from_address, to_address, Robot.LAND_ROBOT);
                 object.put("type", Robot.LAND_ROBOT);
                 object.put("time", time);
                 object.put("price", PriceUtils.price(time, Robot.LAND_ROBOT));
@@ -81,7 +81,7 @@ public class CreateOrder extends HttpServlet {
 
             if (dbConnection.getAvailRobotIds(Robot.UAV).size() > 0) {
                 JSONObject object = new JSONObject();
-                double time = EstimateTime.estimateTime(from_address, to_address);
+                double time = EstimateTime.estimateTime(from_address, to_address, Robot.UAV);
                 object.put("type", Robot.UAV);
                 object.put("time", time);
                 object.put("price", PriceUtils.price(time, Robot.UAV));
