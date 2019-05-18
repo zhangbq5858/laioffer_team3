@@ -1,7 +1,8 @@
 package util;
 
 import entity.Address;
-import util.GeoLocation;
+import entity.GeoLocation;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -269,8 +270,4 @@ public class DistanceUtils {
         // 1279596.824474498
     }
 
-	public static double[] getRouteDistanceAndTime(Address fromAddress, Address toAddress) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
