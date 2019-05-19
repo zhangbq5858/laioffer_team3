@@ -13,10 +13,19 @@ import '../styles/App.css';
 const { Content, Footer, Header } = Layout;
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      path: "",
+    }
+  }
+  handlePath = path => {
+    this.setState({
+      path,
+    })
+  }
 
   render() {
-    //
-    //test
     return (
       <BrowserRouter>
         <div className="App">
@@ -24,7 +33,9 @@ class App extends Component {
             <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
               <img src={logo} className="App-logo" alt="logo" />
               <div className="logo">
-                <Link to="/" ><p className="App-name">Smart Shipping</p></Link>
+                <Link to="/" >
+                  <p className="App-name" onClick={() => this.handlePath("")}>Smart Shipping</p>
+                </Link>
               </div>
                 
               <div className="user-status">
@@ -35,13 +46,12 @@ class App extends Component {
             <Content style={{ padding: '70px 50px 0', }}>
               <Breadcrumb style={{ margin: '16px 0' }}>
                 <Breadcrumb.Item>Home</Breadcrumb.Item>
-                <Breadcrumb.Item>List</Breadcrumb.Item>
-                <Breadcrumb.Item>App</Breadcrumb.Item>
+                <Breadcrumb.Item>{this.state.path}</Breadcrumb.Item>
               </Breadcrumb>
               <div style={{ background: '#fff', padding: 24, minHeight: 780 }}>
                 <Switch>
-                  <Route exact path="/" component={Home} />
-                  <Route exact path="/orders" component={Orders} />
+                  <Route exact path="/" render={() => <Home path={this.handlePath}/>} />
+                  <Route exact path="/orders" render={() => <Orders path={this.handlePath}/>} />
                   <Route exact path="/tracking" component={Tracking} />
                   <Route exact path="/login" component={Login} />
                   <Route exact path="/register" component={Register} />

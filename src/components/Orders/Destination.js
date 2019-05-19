@@ -76,21 +76,6 @@ class DestinationForm extends Component{
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
-        localStorage.setItem(TO_ADDRESS, JSON.stringify({
-          street:values.addTo,
-          city:values.cityTo,
-          state:values.stateTo,
-          zipcode:values.zipTo,
-        }));
-        localStorage.setItem(FROM_ADDRESS, JSON.stringify({
-          street:values.add,
-          city:values.city,
-          state:values.state,
-          zipcode:values.zip,
-        }));
-        localStorage.setItem(SENDER_EMAIL, JSON.stringify({sender_email:values.email}));
-        localStorage.setItem(RECEIVER_EMAIL, JSON.stringify({receiver_email:values.email}));
-
         this.setState({
           to_address:{
             street:values.addTo,
@@ -132,6 +117,7 @@ class DestinationForm extends Component{
           config: { headers: {'Content-Type': 'multipart/form-data' }}
         }).then(response => {
           if (response.status === 200) {
+            message.success("Save information successfully");
             this.props.handleRobotInfo(mock_data.order_id, mock_data.robots);
             this.props.setPage("1");
           } else {
@@ -171,6 +157,7 @@ class DestinationForm extends Component{
         <Form onSubmit={this.handleSubmit} className="form-wrapper">
 
           <Form.Item
+            className="form-title"
           >
             <h1>Enter your Destination Info</h1>
           </Form.Item>
@@ -179,6 +166,7 @@ class DestinationForm extends Component{
             style={{ marginBottom: 0 }}
           >
             <Form.Item
+              className="form-lable"
               label={(
                 <span>
               First Name&nbsp;
@@ -197,6 +185,7 @@ class DestinationForm extends Component{
             </Form.Item>
             <span style={{ display: 'inline-block', width: '24px', textAlign: 'center' }}></span>
             <Form.Item
+              className="form-lable"
               label={(
                 <span>
               Last Name&nbsp;
@@ -348,9 +337,11 @@ class DestinationForm extends Component{
             </Form.Item>
           </Form.Item>
 
+          <hr />      
           <Form.Item
+            className="form-title"
           >
-            <h1>Enter your Destination Info</h1>
+            <h1>Enter Yourself Info</h1>
           </Form.Item>
 
           <Form.Item
