@@ -57,7 +57,7 @@ class TrackingNum extends Component{
     let formUI;
     if (this.state.fetch) {
       formUI = (
-        <Form>
+        <Form className="tracking-form">
           <Form.Item>
             <Form.Item style={{ display: 'inline-block', width: 'calc(30% - 12px)' }}>
               <h3>Order id&nbsp;&#58;</h3>
@@ -93,19 +93,21 @@ class TrackingNum extends Component{
         <h1>Enter Your Order Id: </h1>
         <Form onSubmit={this.handleSubmit} >
           <Form.Item>
-            {getFieldDecorator('orderNum', {
-              rules: [{ required: true, message: 'Please input your order number!' }],
-            })(
-              <Input
-                prefix={<Icon type="barcode" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                placeholder="Order#"
-              />,
-            )}
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button">
-              Search
-            </Button>
+            <Form.Item style={{ display: 'inline-block', width: 'calc(40% - 12px)' }}>
+              {getFieldDecorator('orderNum', {
+                rules: [{ required: true, message: 'Please input your order number!' }],
+              })(
+                <Input
+                  prefix={<Icon type="barcode" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                  placeholder="Order#"
+                />,
+              )}
+            </Form.Item>
+            <Form.Item style={{ display: 'inline-block', width: '40%', paddingLeft:'20px' }}>
+              <Button type="primary" htmlType="submit" className="login-form-button">
+                Search
+              </Button>
+            </Form.Item>
           </Form.Item>
         </Form>
         
@@ -116,5 +118,4 @@ class TrackingNum extends Component{
 }
 
 const Tracking = Form.create()(TrackingNum);
-
 export default Tracking;

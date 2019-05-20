@@ -35,6 +35,7 @@ class DeliverForm extends Component {
           config: { headers: {'Content-Type': 'multipart/form-data' }}
         }).then(response => {
           if (response.status === 200) {
+            message.success("Make order successfully! Thanks");
             this.props.setPage("2");
           } else {
             message.error("oop! something wrong");

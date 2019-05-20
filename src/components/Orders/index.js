@@ -31,23 +31,6 @@ class Orders extends Component {
       current: 0,
       order_id: "",
       robots: [],
-      //   to_fName:"",
-      //   to_lName:"",
-      //   to_street:"",
-      //   to_city:"",
-      //   to_state:"",
-      //   to_zipcode:"",
-      //   to_email:"",
-      //   to_phone:"",
-      //
-      //   from_fName:"",
-      //   from_lName:"",
-      //   from_street:"",
-      //   from_city:"",
-      //   from_state:"",
-      //   from_zipcode:"",
-      //   from_email:"",
-      //   from_phone:"",
     };
   }
 
@@ -86,8 +69,6 @@ class Orders extends Component {
   // };
 
   render() {
-    // const { current, to_fName, to_lName, to_street, to_city, to_state, to_zipcode, to_email, to_phone, from_fName, from_lName, from_street, from_city, from_state, from_zipcode, from_email, from_phone} = this.state;
-    // const values = { to_fName, to_lName, to_street, to_city, to_state, to_zipcode, to_email, to_phone, from_fName, from_lName, from_street, from_city, from_state, from_zipcode, from_email, from_phone};
     const { current } = this.state;
 
     return (
@@ -106,7 +87,7 @@ class Orders extends Component {
 
               {current === 0  && (<Destination setPage={this.setPage} handleRobotInfo={this.handleRobotInfo}/>)}
               {current === 1  && (<Deliver setPage={this.setPage} getRobotInfo={this.getRobotInfo} history={this.props.history}/>)}
-              {current === 2  && (<Success />)}
+              {current === 2  && (<Success setPage={this.setPage} setPath={this.props.path}/>)}
 
             </div>
           </Col>
@@ -116,5 +97,4 @@ class Orders extends Component {
     );
   }
 }
-
 export default Orders;
