@@ -1,27 +1,9 @@
 import React, { Component, Fragment} from 'react';
-import { Form, Input, Select, Button, Modal } from 'antd';
-import { TO_ADDRESS, FROM_ADDRESS, SENDER_EMAIL, RECEIVER_EMAIL} from '../constants';
+import { Form, Input, Select, Button, Modal, } from 'antd';
 import axios from 'axios';
-import $ from 'jquery';
 import {message} from 'antd/lib/index'
 
 const { Option } = Select;
-const mock_data = {
-  order_id: "1234567890987654321",
-  robots: [
-    {
-      robot_id: "1234",
-      type: "land_robot",
-      time: "77",
-      price: "47.90"
-    }, {
-      robot_id: "4321",
-      type: "UAV",
-      time: "31",
-      price: "120.90"
-    }
-  ]
-}
 
 const statesAbbr = ['AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY', 'AE', 'AA', 'AP'];
 
@@ -45,6 +27,8 @@ class DestinationForm extends Component{
       sender_email:"",
       receiver_email:"",
       visible: false, 
+      loading: false,
+      iconLoading: false,
     };
   }
 
@@ -63,11 +47,11 @@ class DestinationForm extends Component{
   };
 
   handleOk = e => {
-    console.log(e);
     this.setState({
       visible: false,
     });
     this.props.form.resetFields();
+    this.props.history.push(`/`);
   };
 
   handleSubmit = (e) => {
@@ -75,7 +59,6 @@ class DestinationForm extends Component{
 
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
         this.setState({
           to_address:{
             street:values.addTo,
@@ -92,33 +75,31 @@ class DestinationForm extends Component{
           sender_email:values.email,
           receiver_email:values.emailTo,
         });
-        const formData = new FormData();
-        formData.set('to_address', JSON.stringify({
-          'street':values.addTo,
-          'city':values.cityTo,
-          'state':values.stateTo,
-          'zipcode':values.zipTo,
-        }));
-        formData.set('from_address', JSON.stringify({
-          'street':values.add,
-          'city':values.city,
-          'state':values.state,
-          'zipcode':values.zip,
-        }));
-        formData.set('sender_email', values.email);
-        formData.set('receiver_email', values.emailTo);
 
-        // this.props.setPage("1");
-
+        this.setState({ iconLoading: true });
         axios({
           method: 'POST',
           url:'/createOrder',
-          data: formData,
-          config: { headers: {'Content-Type': 'multipart/form-data' }}
+          data: JSON.stringify({
+            to_address: {
+              street: values.addTo,
+              city: values.cityTo,
+              state: values.stateTo,
+              zipcode: values.zipTo,
+            }, 
+            from_address: {
+              street: values.add,
+              city: values.city,
+              state: values.state,
+              zipcode: values.zip,
+            },
+            sender_email: values.email,
+            receiver_email: values.emailTo
+          }),
         }).then(response => {
           if (response.status === 200) {
             message.success("Save information successfully");
-            this.props.handleRobotInfo(mock_data.order_id, mock_data.robots);
+            this.props.handleRobotInfo(response.data.order_id, response.data.robots);
             this.props.setPage("1");
           } else {
             this.showModal();
@@ -128,23 +109,10 @@ class DestinationForm extends Component{
           console.log(err);
         });
 
-
-        // $.ajax({
-        //   url:'/createOrder',
-        //   method: 'POST',
-        //   data: formData,
-        //   processData: false,
-        //   dataType: 'text',
-        // }).then(res => {
-        //   console.log(res);
-        //   this.props.setPage("1");
-        // }, error => {
-        //   console.log(error)
-        //   message.error(error.responseText);
-        // }).catch(err => {
-        //   console.log(err)
-        // });
-
+        this.setState({
+          loading: !this.state.loading,
+          iconLoading: !this.state.iconLoading,
+        });
       }
     });
   }
@@ -518,7 +486,7 @@ class DestinationForm extends Component{
               )}
             </Form.Item>
             <Form.Item>
-              <Button type="primary" htmlType="submit" className="login-form-button">
+              <Button type="primary" htmlType="submit" className="login-form-button" loading={this.state.loading}>
                 Submit
               </Button>
             </Form.Item>
@@ -528,18 +496,16 @@ class DestinationForm extends Component{
 
         <div>
         <Modal
-          title="Basic Modal"
+          title="oops..." 
           visible={this.state.visible}
-          onOk={this.handleOk}
           footer={[
             <Button key="back" onClick={this.handleOk}>
               ok
             </Button>
           ]}
         >
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
+          <p>We do not have robots right now. Click ok to back the home page.</p>
+          <p>Sorry for inconvenience</p>
         </Modal>
       </div>
 

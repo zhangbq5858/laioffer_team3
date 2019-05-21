@@ -26,33 +26,36 @@ class TrackingNum extends Component{
 
   handleSubmit = e => {
     e.preventDefault();
+
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const formData = new FormData();
-        formData.set('order_id', values.orderNum);
+        // const formData = new FormData();
+        // formData.set('order_id', values.orderNum);
         axios({
           method: 'POST',
           url:'/track',
-          data: formData,
-          config: { headers: {'Content-Type': 'multipart/form-data' }}
+          // data: formData,
+          data: JSON.stringify({ order_id: values.orderNum }),
+          // config: { headers: {'Content-Type': 'multipart/form-data' }}
         }).then(response => {
           if (response.status === 200) {
             this.setState({ fetch: true });
           } else {
             message.error("Wrong order number! Please check!");
-            this.setState({ fetch: false });
+            this.setState({ fetch: true });
           }
           console.log(response);
         }).catch(err => {
           console.log(err);
         });
+        this.props.form.resetFields();
       }
     });
   };
 
   render() {
 
-    const {current_address} = mock_data;
+    const { current_address } = mock_data;
     const { getFieldDecorator } = this.props.form;
     let formUI;
     if (this.state.fetch) {
@@ -86,8 +89,7 @@ class TrackingNum extends Component{
           </Form.Item>
         </Form>
       );
-    }
-
+    } 
     return(
       <div>
         <h1>Enter Your Order Id: </h1>
