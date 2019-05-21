@@ -43,15 +43,14 @@ class App extends Component {
               </div>
             </Header>
 
-            <Content style={{ padding: '70px 50px 0', }}>
+            <Content style={{ padding: '90px 60px 0', }}>
               <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item>Home</Breadcrumb.Item>
-                <Breadcrumb.Item>{this.state.path}</Breadcrumb.Item>
+                <Breadcrumb.Item></Breadcrumb.Item>
               </Breadcrumb>
-              <div style={{ background: '#fff', padding: 24, minHeight: 780 }}>
+              <div style={{ background: '#fff', padding: 24, minHeight: 760 }}>
                 <Switch>
-                  <Route exact path="/" render={() => <Home path={this.handlePath}/>} />
-                  <Route exact path="/orders" render={() => <Orders path={this.handlePath}/>} />
+                  <Route exact path="/" component={Home} />
+                  <Route exact path="/orders" component={Orders} />
                   <Route exact path="/tracking" component={Tracking} />
                   <Route exact path="/login" component={Login} />
                   <Route exact path="/register" component={Register} />

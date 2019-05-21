@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col } from 'antd';
+import history_icon from '../assets/images/history.png';
+import order_icon from '../assets/images/order.png';
 import "../styles/Home.css";
 
 const Home = props => {
@@ -9,7 +11,9 @@ const Home = props => {
 			<Row type="flex" justify="space-around" align="middle">
 				<Col span={8}>
 					<Link to="/orders">
-					  <div className="home-select-btn" onClick={() => props.path("Orders")}>
+					<img className="img-btn" src={order_icon} alt="order" />
+					  <div className="home-select-btn">
+					  		
 							<span>Make Orders</span>
 						</div>
 					</Link>
@@ -17,7 +21,9 @@ const Home = props => {
 
 				<Col span={8}>
 					<Link to="/tracking">
-						<div className="home-select-btn" onClick={() => props.path("Tracking")}>
+					<img className="img-btn" src={history_icon} alt="history" />
+						<div className="home-select-btn">
+							
 							<span>Tracking</span>
 						</div>
 					</Link>
