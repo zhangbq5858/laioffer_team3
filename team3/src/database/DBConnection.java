@@ -43,7 +43,9 @@ public interface DBConnection {
     
     public boolean deleteOrder(String orderId);
     
-    public boolean confirmOrder(JSONObject robotObject, String orderId);
+    public boolean confirmOrder(JSONObject input);
+    
+    public boolean updateOrder(String orderId, Integer robotId);
     
     public void close();
 

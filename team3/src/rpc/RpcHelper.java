@@ -38,17 +38,21 @@ public class RpcHelper {
 				return null;
 			}
 			
-			if(line.charAt(0) == '{') {  // request from postman
+			if(line.charAt(0) == '{') {  // request from postman json
 				StringBuilder sBuilder = new StringBuilder();
+				System.out.println("rpc input is json");
 				while(line != null) {
+					System.out.println(line);
 					sBuilder.append(line);
 					line = reader.readLine();
 				}
 				return new JSONObject(sBuilder.toString());
-			} else { //request from front end
+			} else { //request from front end formdata
 				int count = 0;
+				System.out.println("rpc input is formdata");
 				JSONObject jsonObject = new JSONObject();
 				while(line != null) {
+					System.out.println(line);
 					if(count == 1) {
 						key = line.split(";")[1].split("=")[1].split("\"")[1].trim();
 					} else if (count == 3) {

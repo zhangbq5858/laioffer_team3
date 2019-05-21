@@ -533,4 +533,16 @@ public class CloudSQLConnection implements DBConnection{
         } 
         return null;
 	}
+
+	@Override
+	public boolean confirmOrder(JSONObject input) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean updateOrder(String orderId, Integer robotId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

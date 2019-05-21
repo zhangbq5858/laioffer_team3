@@ -334,17 +334,38 @@ public class MySQLConnection implements DBConnection{
 	        return false;
 	    }
 	    
-	    public boolean confirmOrder(JSONObject robotObject, String orderId) {
+	    
+	    //TODO 将临时改为确认
+	    public boolean confirmOrder(JSONObject input) {
 
 	        try {
 	        	if (conn == null)
 		    		throw new FileNotFoundException("No connection to database");
 	        	// create from_address and to_address first;
-	            String sql = "UPDATE orders SET robot_id = ?, price = ? WHERE order_id = ?;";
+	        	JSONObject robotJsonObject = input.getJSONObject("robot");
+	            String sql = "UPDATE orders SET price = ?, appointment_time = ?  WHERE order_id = ?;";
 	            PreparedStatement stmt = conn.prepareStatement(sql);
-	            stmt.setInt(1, robotObject.getInt("robot_id"));
-	            stmt.setDouble(2, robotObject.getDouble("price"));
-	            stmt.setString(3, orderId);
+	            stmt.setDouble(1, robotJsonObject.getDouble("price"));
+	            stmt.setString(2, input.getString("time"));
+	            stmt.setString(3, input.getString("order_id"));
+	            return stmt.execute();
+	            
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } 
+	        return false;
+	    }
+	    // TODO 当有机器人开始执行这项order时，更新order信息
+	    public boolean updateOrder(String orderId, Integer robotId) {
+
+	        try {
+	        	if (conn == null)
+		    		throw new FileNotFoundException("No connection to database");
+	        	// create from_address and to_address first;
+	            String sql = "UPDATE orders SET robot_id = ? WHERE order_id = ?;";
+	            PreparedStatement stmt = conn.prepareStatement(sql);
+	            stmt.setInt(1, robotId);
+	            stmt.setString(2, orderId);
 	            return stmt.execute();
 	            
 	        } catch (Exception e) {
