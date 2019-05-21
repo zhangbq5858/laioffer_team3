@@ -51,7 +51,7 @@ public class ConfirmOrder extends HttpServlet {
             JSONObject input = RpcHelper.readJSONObject(request);
 
             // select available robot and get robot_id
-            JSONObject robotJsonObject = input.getJSONObject("robot");
+            JSONObject robotJsonObject = input.getJSONArray("robot").getJSONObject(0);
             String type = robotJsonObject.getString("type");
             Integer robotId = null;
             while (true) {
@@ -81,9 +81,11 @@ public class ConfirmOrder extends HttpServlet {
 
             Order order = orderBuilder.build();
             //3. create robot and began work
+        
             Robot robot = new Robot(robotId, 5000);
             robot.addWork(order);
-            robot.beganWork();
+            Thread thread = new Thread(robot);
+            thread.start();
             RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
 
         } catch (Exception e) {

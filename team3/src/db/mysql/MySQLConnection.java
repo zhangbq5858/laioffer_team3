@@ -67,6 +67,7 @@ public class MySQLConnection implements DBConnection{
 	                obj.put("robot_id", robot_id);
 	                obj.put("from_address", fromAddress);
 	                obj.put("to_address", toAddress);
+	                obj.put("expect_arrive_time", rs.getString("expect_arrive_time"));
 	            }
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -340,11 +341,12 @@ public class MySQLConnection implements DBConnection{
 	        	if (conn == null)
 		    		throw new FileNotFoundException("No connection to database");
 	        	// create from_address and to_address first;
-	            String sql = "UPDATE orders SET robot_id = ?, price = ? WHERE order_id = ?;";
+	            String sql = "UPDATE orders SET robot_id = ?, price = ?, status = ? WHERE order_id = ?;";
 	            PreparedStatement stmt = conn.prepareStatement(sql);
 	            stmt.setInt(1, robotObject.getInt("robot_id"));
 	            stmt.setDouble(2, robotObject.getDouble("price"));
-	            stmt.setString(3, orderId);
+	            stmt.setString(3, Order.STATUS_INITIAL);
+	            stmt.setString(4, orderId);
 	            return stmt.execute();
 	            
 	        } catch (Exception e) {

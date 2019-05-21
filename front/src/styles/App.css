@@ -1,0 +1,54 @@
+@import '../../node_modules/antd/dist/antd.css';
+@import 'Home.css';
+@import 'Orders.css';
+@import 'Tracking.css';
+
+
+.App-logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 60px;
+    float: left;
+}
+
+.logo {
+    width: 180px;
+    height: 31px;
+
+    /* background: rgba(255, 255, 255, .2); */
+    margin: 16px 24px 16px 0;
+    float: left;
+}
+
+.App-name {
+    font-family: cursive;
+    color: darkorange;
+    font-weight: bold;
+    top: -15px;
+    font-size: 24px;
+    position: relative;
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.user-status {
+    width: 120px;
+    height: 31px;
+    margin: 0 24px 16px 0;
+    float: right;
+}
+
+.user-status-text {
+    color: white;
+}
+
+h1 {
+    font-family: cursive;
+    color: darkorange;
+}

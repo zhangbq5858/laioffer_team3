@@ -100,7 +100,7 @@ public class MySQLTableCreation {
 					+ "robot_id INT,"
 					+ "created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 					+ "updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-					+ "status VARCHAR(255) DEFAULT \"" + Order.STATUS_INITIAL + "\" ,"
+					+ "status VARCHAR(255) DEFAULT \"" + Order.STATUS_TEMPORARY + "\" ,"
 					+ "price FLOAT,"
 					+ "receiver_email VARCHAR(255),"
 					+ "sender_email VARCHAR(255),"

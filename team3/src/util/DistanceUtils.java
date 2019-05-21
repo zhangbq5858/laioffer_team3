@@ -183,52 +183,7 @@ public class DistanceUtils {
 
         return d;
     }
-    
-    public static void getRoute() {
-    	  Address fromAddress = new Address.AddressBuilder().setStreet("254DavisSt").setCity("Seattle").build();
-          Address toAddress = new Address.AddressBuilder().setCity("2340BroadmoorDrE").setCity("Seattle").build();
-          GeoLocation fromGeoLoc = getGeocode(fromAddress);
-          GeoLocation toGeoLoc = getGeocode(toAddress);
-          String u = "https://maps.googleapis.com/maps/api/directions/json?origin=" + fromGeoLoc.getLocationString() +"&destination=" + toGeoLoc.getLocationString() + "&key=" + API_KEY;
-          try {
-              HttpURLConnection connection = (HttpURLConnection) new URL(u).openConnection();
-              connection.setRequestMethod("GET");
-
-              int responseCode = connection.getResponseCode();
-              System.out.println("Response Code: " + responseCode);
-
-
-              // read every 8k data
-              BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-              String line;
-              StringBuilder response = new StringBuilder();
-
-              while ((line = reader.readLine()) != null) {
-                  response.append(line);
-              }
-
-              reader.close();
-              JSONObject object = new JSONObject(response.toString());
-              System.out.println("route");
-              System.out.println(object);;
-//              if (!object.isNull("rows")) {
-//                  JSONArray rows = object.getJSONArray("rows");
-//                  JSONObject row = rows.getJSONObject(0);
-//
-//                  if (!row.isNull("elements")) {
-//                      JSONArray elements = row.getJSONArray("elements");
-//                      JSONObject element = elements.getJSONObject(0);
-//
-//                      if (!element.isNull("distance")) {
-//                          JSONObject distance = element.getJSONObject("distance");
-//                          dist = distance.getDouble("value");
-//                      }
-//                  }
-//              }
-          } catch (IOException | JSONException e) {
-              e.printStackTrace();
-          }
-    }
+  
 
     public static GeoLocation getGeocode(Address address) {
         GeoLocation geoLoc = new GeoLocation();
@@ -292,7 +247,6 @@ public class DistanceUtils {
     }
 
     public static void main(String[] args) {
-    	getRoute();
         Address fromAddress = new Address.AddressBuilder().setStreet("254 Davis St").setCity("Seattle").build();
         Address toAddress = new Address.AddressBuilder().setCity("San Francisco").build();
 
