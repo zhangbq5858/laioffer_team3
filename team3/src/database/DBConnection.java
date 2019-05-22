@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import entity.Address;
 import entity.Order;
 import entity.Robot;
+import jnr.ffi.Struct.int16_t;
 
 
 public interface DBConnection {
@@ -43,7 +44,9 @@ public interface DBConnection {
     
     public boolean deleteOrder(String orderId);
     
-    public boolean confirmOrder(JSONObject robotObject, String orderId);
+    public boolean confirmOrder(JSONObject input);
+    
+    public boolean updateOrder(String orderId, Integer robotId);
     
     public void close();
 

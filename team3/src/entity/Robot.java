@@ -33,7 +33,7 @@ import util.EstimateTime;
 // robot 启动流程： addWord(order) -> beganWork(new Date() set time to began work, default immediately) 
 
 
-public class Robot {
+public class Robot implements Runnable{
 //	public static final String ADDINGWORK = "addingWORK";
 	public static final String PICKING = "picking";
 	public static final String SENDING = "sending";
@@ -94,7 +94,7 @@ public class Robot {
 	}
 	
 	//initialize robot with robot_id and interval_report_time.
-	public Robot(int robotId, int interval_report_time) throws FileNotFoundException, IOException, SQLException {
+	public Robot(int robotId, int interval_report_time) {
 		this.dbConnection = new DBConnectionFactory().getConnection();
 		this.robotId = robotId;
 		this.interval_report_time = interval_report_time;
@@ -169,11 +169,11 @@ public class Robot {
 	
 	
 	
-	public void beganWork() throws InterruptedException, FileNotFoundException, IOException, SQLException {
+	public void beganWork() throws InterruptedException {
 		beganWork(new Date());
 	}
 	
-	public void beganWork(Date beginDate) throws InterruptedException, FileNotFoundException, IOException, SQLException {
+	public void beganWork(Date beginDate) throws InterruptedException{
 		
 		Timer timer = new Timer(true);
 		TimerTask reporTask = new TimerTask() {
@@ -282,6 +282,16 @@ public class Robot {
 		jsonObject.put("speed", speed);
 
 		return jsonObject;
+	}
+
+	@Override
+	public void run() {
+		try {
+			this.beganWork();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
