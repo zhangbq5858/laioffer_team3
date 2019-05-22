@@ -100,7 +100,7 @@ public class MySQLTableCreation {
 					+ "robot_id INT,"
 					+ "created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 					+ "updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-					+ "appointment_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+					+ "appointment_time DATETIME,"
 					+ "temporary BOOLEAN DEFAULT TRUE,"
 					+ "status VARCHAR(255) DEFAULT \"" + Order.STATUS_INITIAL + "\" ,"
 					+ "price FLOAT,"

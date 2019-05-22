@@ -282,11 +282,6 @@ public class MySQLConnection implements DBConnection{
 	        return false;
 	    }
 
-	    // TODO: implement this method to update order by order_id  ?? only update price time robotid?
-	    public boolean updateOrder(Order o) {
-	        return false;
-	    }
-	    
 	    // TODO: implement this method to complement robot information(type, branch_id, geolocation) with input robot. 
 	    public boolean complementRobot(Robot robot) {
 	        try {
@@ -342,11 +337,11 @@ public class MySQLConnection implements DBConnection{
 	        	if (conn == null)
 		    		throw new FileNotFoundException("No connection to database");
 	        	// create from_address and to_address first;
-	        	JSONObject robotJsonObject = input.getJSONObject("robot");
+	        	JSONObject robotJsonObject = input.getJSONArray("robot").getJSONObject(0);
 	            String sql = "UPDATE orders SET price = ?, appointment_time = ?  WHERE order_id = ?;";
 	            PreparedStatement stmt = conn.prepareStatement(sql);
 	            stmt.setDouble(1, robotJsonObject.getDouble("price"));
-	            stmt.setString(2, input.getString("time"));
+	            stmt.setString(2, robotJsonObject.getString("appointment_time"));
 	            stmt.setString(3, input.getString("order_id"));
 	            return stmt.execute();
 	            

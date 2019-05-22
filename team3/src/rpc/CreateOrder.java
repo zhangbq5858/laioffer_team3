@@ -2,6 +2,7 @@ package rpc;
 
 import db.cloudsql.CloudSQLConnection;
 import entity.Address;
+import entity.Management;
 import entity.Order;
 import entity.Robot;
 //import org.apache.commons.io.IOUtils;
@@ -25,6 +26,8 @@ import database.DBConnectionFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 //@WebServlet(urlPatterns = "/createOrder", name = "Order")
 @WebServlet("/createOrder")
@@ -68,7 +71,7 @@ public class CreateOrder extends HttpServlet {
 
             // 4. check whether have available robot from db and write back to frontend
             JSONArray robots_json = new JSONArray();
-
+/*
             // if we have available landrobot in branch:
             if (dbConnection.getAvailRobotIds(Robot.LAND_ROBOT).size() > 0) {
                 JSONObject object = new JSONObject();
@@ -87,15 +90,37 @@ public class CreateOrder extends HttpServlet {
                 object.put("price", PriceUtils.price(time, Robot.UAV));
                 robots_json.put(object);
             }
+*/
+            if (true) {
+	            JSONObject object = new JSONObject();
+	            Calendar appointmentTime = Management.getInstance().getNextAvailableTime(Robot.LAND_ROBOT);
+	            double time = EstimateTime.estimateTime(from_address, to_address, Robot.LAND_ROBOT);
+	            object.put("type", Robot.LAND_ROBOT);
+	            object.put("time", time);
+	            object.put("price", PriceUtils.price(time, Robot.LAND_ROBOT));
+	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	            object.put("appointment_time", sdf.format(appointmentTime.getTime()));
+	            robots_json.put(object);
+            }
+            
+            if (true) {
+	            JSONObject object = new JSONObject();
+	            Calendar appointmentTime = Management.getInstance().getNextAvailableTime(Robot.UAV);
+	            double time = EstimateTime.estimateTime(from_address, to_address, Robot.UAV);
+	            object.put("type", Robot.UAV);
+	            object.put("time", time);
+	            object.put("price", PriceUtils.price(time, Robot.UAV));
+	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	            object.put("appointment_time", sdf.format(appointmentTime.getTime()));
+	            robots_json.put(object);
+            }
 
-
+            
             JSONObject order_json = new JSONObject();
             order_json.put("order_id", order.getOrderId());
             order_json.put("distance", DistanceUtils.getStraightDistance(from_address, to_address));
             order_json.put("robots", robots_json);
-            order_json.put("price", 10);
            
-
             RpcHelper.writeJsonObject(response, order_json);
         } catch (Exception e) {
             e.printStackTrace();

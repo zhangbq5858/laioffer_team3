@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import entity.Address;
 import entity.Order;
 import entity.Robot;
+import jnr.ffi.Struct.int16_t;
 
 
 public interface DBConnection {
