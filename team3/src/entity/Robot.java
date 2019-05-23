@@ -62,7 +62,7 @@ public class Robot implements Runnable{
 	
 	//TODO private Address currentAddress;
 	
-	public static void main(String[] inputs) throws FileNotFoundException, IOException, InterruptedException, SQLException {
+	public static void main(String[] inputs) {
 //		JSONObject fromAddressJO = new JSONObject();
 //		JSONObject toAddressJO = new JSONObject();
 //		

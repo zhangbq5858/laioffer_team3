@@ -67,7 +67,7 @@ public class Track extends HttpServlet {
 				status.put("current_geoLocation", current_geo_location);
 			}
 			//not delivered, fetch current geoLocation from robot table
-			else {
+			else if (!status.getString("status").equals(Order.STATUS_TEMPORARY)){
 				Integer robotId = status.getInt("robot_id");
 				//TODO get address by use robot geolocation to calculate the Address
 				JSONObject robotInformation = dbConnection.getRobotInformation(robotId);

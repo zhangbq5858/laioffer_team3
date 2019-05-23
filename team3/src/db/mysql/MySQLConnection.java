@@ -67,6 +67,7 @@ public class MySQLConnection implements DBConnection{
 	                obj.put("robot_id", robot_id);
 	                obj.put("from_address", fromAddress);
 	                obj.put("to_address", toAddress);
+	                obj.put("expect_arrive_time", rs.getString("expect_arrive_time"));
 	            }
 	        } catch (Exception e) {
 	            e.printStackTrace();
