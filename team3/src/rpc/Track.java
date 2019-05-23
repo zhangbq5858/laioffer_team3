@@ -49,6 +49,12 @@ public class Track extends HttpServlet {
 			DBConnection dbConnection = new DBConnectionFactory().getConnection();
 			JSONObject status = dbConnection.getOrderStatus(orderId);
 			
+			if(status.isNull("status")) {
+				status.put("status", "Invalid Order Number");
+		    	RpcHelper.writeJsonObject(response, status);
+		    	return;
+			}
+			
 			//delivered, put to_address as the current location
 			if (status.getString("status").equals(Order.STATUS_DELIVERED)) {
 				JSONObject toAddress = status.getJSONObject("to_address");
@@ -70,9 +76,6 @@ public class Track extends HttpServlet {
 				current_geo_location.put("current_lng", robotInformation.getDouble("current_lng"));
 				status.put("current_geoLocation", current_geo_location);
 			}
-			
-			status.remove("robot_id");
-			status.remove("to_address");
 			status.put("order_id", orderId);
 			RpcHelper.writeJsonObject(response, status);
 		} catch (Exception e) {

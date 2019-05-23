@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 
 public class Order {
+	public static final String STATUS_TEMPORARY = "temporary";
     public static final String STATUS_DELIVERED = "Delivered";
     public static final String STATUS_ONWAY = "On the way";
     public static final String STATUS_INITIAL = "Initialized";

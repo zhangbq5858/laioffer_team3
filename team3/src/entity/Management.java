@@ -42,7 +42,7 @@ public class Management implements Runnable{
 	public void AddTask(Order order, String type) {
 		if(type.equals(Robot.LAND_ROBOT)) {
 			allLandTasks.put(order.getAppointmentTime(), order);
-		} else if(type.equals(Robot.UAV)) {
+		} else if(type.equalsIgnoreCase(Robot.UAV)) {
 			allUAVTasks.put(order.getAppointmentTime(), order);
 		}
 	}
@@ -87,7 +87,7 @@ public class Management implements Runnable{
 			TreeMap<Calendar, Order> map = type.equals(Robot.LAND_ROBOT) ? allLandTasks : allUAVTasks;
 			while(true) {
 				if(map.size() == 0) { //没有任务时，休眠一分钟后检查
-					System.out.println("Task Manager have no order now");
+					System.out.println("Task Manager have no " + type + " order now");
 					try {
 						Thread.sleep(1 * 60 * 1000);
 					} catch (InterruptedException e) {

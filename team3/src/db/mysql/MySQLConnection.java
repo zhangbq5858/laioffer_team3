@@ -338,11 +338,12 @@ public class MySQLConnection implements DBConnection{
 		    		throw new FileNotFoundException("No connection to database");
 	        	// create from_address and to_address first;
 	        	JSONObject robotJsonObject = input.getJSONArray("robot").getJSONObject(0);
-	            String sql = "UPDATE orders SET price = ?, appointment_time = ?  WHERE order_id = ?;";
+	            String sql = "UPDATE orders SET price = ?, appointment_time = ?, status = ?  WHERE order_id = ?;";
 	            PreparedStatement stmt = conn.prepareStatement(sql);
 	            stmt.setDouble(1, robotJsonObject.getDouble("price"));
 	            stmt.setString(2, robotJsonObject.getString("appointment_time"));
-	            stmt.setString(3, input.getString("order_id"));
+	            stmt.setString(2, Order.STATUS_INITIAL);
+	            stmt.setString(4, input.getString("order_id"));
 	            return stmt.execute();
 	            
 	        } catch (Exception e) {

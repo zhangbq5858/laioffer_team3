@@ -102,7 +102,7 @@ public class MySQLTableCreation {
 					+ "updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 					+ "appointment_time DATETIME,"
 					+ "temporary BOOLEAN DEFAULT TRUE,"
-					+ "status VARCHAR(255) DEFAULT \"" + Order.STATUS_INITIAL + "\" ,"
+					+ "status VARCHAR(255) DEFAULT \"" + Order.STATUS_TEMPORARY + "\" ,"
 					+ "price FLOAT,"
 					+ "receiver_email VARCHAR(255),"
 					+ "sender_email VARCHAR(255),"
