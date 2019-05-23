@@ -95,9 +95,10 @@ public class CreateOrder extends HttpServlet {
 	            JSONObject object = new JSONObject();
 	            Calendar appointmentTime = Management.getInstance().getNextAvailableTime(Robot.LAND_ROBOT);
 	            double time = EstimateTime.estimateTime(from_address, to_address, Robot.LAND_ROBOT);
+	            int minTime = EstimateTime.toMin(time);
 	            object.put("type", Robot.LAND_ROBOT);
-	            object.put("time", time);
-	            object.put("price", PriceUtils.price(EstimateTime.toMin(time), Robot.LAND_ROBOT));
+	            object.put("time", minTime);
+	            object.put("price", PriceUtils.price(minTime, Robot.LAND_ROBOT));
 	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	            object.put("appointment_time", sdf.format(appointmentTime.getTime()));
 	            robots_json.put(object);
@@ -107,9 +108,10 @@ public class CreateOrder extends HttpServlet {
 	            JSONObject object = new JSONObject();
 	            Calendar appointmentTime = Management.getInstance().getNextAvailableTime(Robot.UAV);
 	            double time = EstimateTime.estimateTime(from_address, to_address, Robot.UAV);
-	            object.put("type", Robot.UAV);
-	            object.put("time", time);
-	            object.put("price", PriceUtils.price(EstimateTime.toMin(time), Robot.UAV));
+                int minTime = EstimateTime.toMin(time);
+                object.put("type", Robot.UAV);
+	            object.put("time", minTime);
+	            object.put("price", PriceUtils.price(minTime, Robot.UAV));
 	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	            object.put("appointment_time", sdf.format(appointmentTime.getTime()));
 	            robots_json.put(object);
