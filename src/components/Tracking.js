@@ -16,6 +16,7 @@ class TrackingNum extends Component{
       to: {},
       loading: false,
       iconLoading: false,
+      inProcess: false,
     }
   }
 
@@ -35,8 +36,15 @@ class TrackingNum extends Component{
           // config: { headers: {'Content-Type': 'multipart/form-data' }}
         }).then(response => {
           if (response.data.status === "Invalid Order Number") {
-            this.setState({ validOrderId: false });
             this.setState({
+              // inProcess: !this.state.inProcess,
+              validOrderId: false, 
+              loading: !this.state.loading,
+              iconLoading: !this.state.iconLoading,
+            });
+          } else if (response.data.status === "In Process") {
+            this.setState({
+              inProcess: true,
               loading: !this.state.loading,
               iconLoading: !this.state.iconLoading,
             });
@@ -44,7 +52,7 @@ class TrackingNum extends Component{
             let {expect_arrive_time, from_address, to_address, status, order_id } = response.data;
             this.setState({
               fetch: true,
-              validOrderId: true,
+              validOrderId: !this.state.validOrderId,
               expect_arrive_time,
               status,
               from: from_address,
@@ -56,7 +64,6 @@ class TrackingNum extends Component{
               iconLoading: !this.state.iconLoading,
             });
           }
-          console.log(response.data);
         }).catch(err => {
           console.log(err);
           this.setState({
@@ -75,10 +82,11 @@ class TrackingNum extends Component{
 
   render() {
     
-    const { order_id, expect_arrive_time, status, from, to, validOrderId } = this.state;
+    const { order_id, expect_arrive_time, status, from, to, validOrderId, inProcess, fetch} = this.state;
     const { getFieldDecorator } = this.props.form;
     let formUI;
-    if (this.state.fetch && validOrderId) {
+    console.log(fetch)
+    if (this.state.fetch) {
       formUI = (
         <Form className="tracking-form">
           <Form.Item>
@@ -125,6 +133,12 @@ class TrackingNum extends Component{
               <span>{to.street + `, ` + to.city + `, ` + to.state + `, ` + to.zipcode }</span>
             </Form.Item>
           </Form.Item>
+        </Form>
+      );
+    } else if (inProcess) {
+      formUI = (
+        <Form className="tracking-form">
+          <h3><Icon type="warning" theme="twoTone" twoToneColor="#1890ff"/> {' '}<span style={{ color: '#1890ff' }}>Order is processed. Please wait.</span></h3>
         </Form>
       );
     } else if (!validOrderId){
