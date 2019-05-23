@@ -117,7 +117,7 @@ public class Management implements Runnable{
 				            map.remove(entry.getKey());
 				            //机器人执行任务
 				            Thread t = new Thread(robot);
-				            t.run();
+				            t.start();
 						}
 					} else {
 						//有任务但是最早的任务要在未来才需要执行 休眠五分钟
@@ -139,8 +139,8 @@ public class Management implements Runnable{
 	public void run() {
 		Thread uav_tasks = new Thread(new assignWork(Robot.UAV));
 		Thread land_tasks = new Thread(new assignWork(Robot.LAND_ROBOT));
-		uav_tasks.run();
-		land_tasks.run();
+		uav_tasks.start();
+		land_tasks.start();
 		
 	}
 	
