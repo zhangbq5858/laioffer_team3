@@ -1,6 +1,7 @@
 package entity;
 
 
+import java.util.Calendar;
 import java.util.UUID;
 
 import org.json.JSONObject;
@@ -19,6 +20,7 @@ public class Order {
     private String receiverEmail;
     private Address fromAddress;
     private Address toAddress;
+    private Calendar appointmentTime;
     
     
     private Order(OrderBuilder builder) {
@@ -27,6 +29,7 @@ public class Order {
     	this.receiverEmail = builder.receiverEmail;
     	this.fromAddress = builder.fromAddress;
     	this.toAddress = builder.toAddress;
+    	this.appointmentTime = builder.appointmentTime;
     }
     
     
@@ -82,6 +85,15 @@ public class Order {
     public void setToAddress(Address toAddress) {
         this.toAddress = toAddress;
     }
+    
+    public Calendar getAppointmentTime() {
+        return appointmentTime;
+    }
+    
+    public void setAppointmentTime(Calendar appointmentTime) {
+    	this.appointmentTime = appointmentTime;
+    			
+    }
 
     // TODO: apply this method to generate random order id for the newly fake order
     // e.g.
@@ -97,6 +109,7 @@ public class Order {
         private String receiverEmail;
         private Address fromAddress;
         private Address toAddress;
+        private Calendar appointmentTime;
         
         public OrderBuilder setOrderId(String orderId) {
         	this.orderId = orderId;
@@ -117,6 +130,10 @@ public class Order {
         }
         public OrderBuilder setToAddress(Address toAddress) {
         	this.toAddress = toAddress;
+        	return this;
+        }
+        public OrderBuilder setToAppointmentTime(Calendar appointmentTime) {
+        	this.appointmentTime = appointmentTime;
         	return this;
         }
         public Order build() {

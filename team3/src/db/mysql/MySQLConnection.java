@@ -283,11 +283,6 @@ public class MySQLConnection implements DBConnection{
 	        return false;
 	    }
 
-	    // TODO: implement this method to update order by order_id  ?? only update price time robotid?
-	    public boolean updateOrder(Order o) {
-	        return false;
-	    }
-	    
 	    // TODO: implement this method to complement robot information(type, branch_id, geolocation) with input robot. 
 	    public boolean complementRobot(Robot robot) {
 	        try {
@@ -335,18 +330,39 @@ public class MySQLConnection implements DBConnection{
 	        return false;
 	    }
 	    
-	    public boolean confirmOrder(JSONObject robotObject, String orderId) {
+	    
+	    //TODO 将临时改为确认
+	    public boolean confirmOrder(JSONObject input) {
 
 	        try {
 	        	if (conn == null)
 		    		throw new FileNotFoundException("No connection to database");
 	        	// create from_address and to_address first;
-	            String sql = "UPDATE orders SET robot_id = ?, price = ?, status = ? WHERE order_id = ?;";
+	        	JSONObject robotJsonObject = input.getJSONArray("robot").getJSONObject(0);
+	            String sql = "UPDATE orders SET price = ?, appointment_time = ?, status = ?  WHERE order_id = ?;";
 	            PreparedStatement stmt = conn.prepareStatement(sql);
-	            stmt.setInt(1, robotObject.getInt("robot_id"));
-	            stmt.setDouble(2, robotObject.getDouble("price"));
+	            stmt.setDouble(1, robotJsonObject.getDouble("price"));
+	            stmt.setString(2, robotJsonObject.getString("appointment_time"));
 	            stmt.setString(3, Order.STATUS_INITIAL);
-	            stmt.setString(4, orderId);
+	            stmt.setString(4, input.getString("order_id"));
+	            return stmt.execute();
+	            
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } 
+	        return false;
+	    }
+	    // TODO 当有机器人开始执行这项order时，更新order信息
+	    public boolean updateOrder(String orderId, Integer robotId) {
+
+	        try {
+	        	if (conn == null)
+		    		throw new FileNotFoundException("No connection to database");
+	        	// create from_address and to_address first;
+	            String sql = "UPDATE orders SET robot_id = ? WHERE order_id = ?;";
+	            PreparedStatement stmt = conn.prepareStatement(sql);
+	            stmt.setInt(1, robotId);
+	            stmt.setString(2, orderId);
 	            return stmt.execute();
 	            
 	        } catch (Exception e) {

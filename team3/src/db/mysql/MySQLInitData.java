@@ -73,7 +73,7 @@ public class MySQLInitData {
 	
 	private static void insertRobotData(Connection conn) throws SQLException {
 		// 200 land_robot	
-		int lrNumber = 20;
+		int lrNumber = 1;
 		String sql = "INSERT INTO robots(branch_id, type) VALUES(?, ?)";
 		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setString(2, Robot.LAND_ROBOT);
@@ -83,7 +83,7 @@ public class MySQLInitData {
 			ps.executeUpdate();
 		}
 		//100 UAV
-		int uNumber =  10;
+		int uNumber =  1;
 		sql = "INSERT INTO robots(branch_id, type, speed) VALUES(?, ?, ?)";
 		ps = conn.prepareStatement(sql);
 		ps.setString(2, Robot.UAV);
