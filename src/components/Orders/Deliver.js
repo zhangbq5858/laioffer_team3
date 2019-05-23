@@ -30,7 +30,7 @@ class DeliverForm extends Component {
           url:'/confirmOrder',
           data: JSON.stringify({
             order_id: this.props.getRobotInfo()[0],
-            robot: selectRobot
+            robot: selectRobot,
           }),
         }).then(response => {
           if (response.status === 200) {
@@ -79,8 +79,6 @@ class DeliverForm extends Component {
     });
     this.setState({
       visible: false,
-      loading: !this.state.loading,
-      iconLoading: !this.state.iconLoading,
     });
   };
 
@@ -109,12 +107,16 @@ class DeliverForm extends Component {
       title: 'Price($)',
       dataIndex: 'price',
       key: 'price',
+    }, {
+      title: 'Available Time',
+      dataIndex: 'appointment_time',
+      key: 'appointment_time',
     }];
 
     if (this.props.getRobotInfo()[1].length > 0) {
       radioUI = (
         <div>
-          <Form onSubmit={this.handleSubmit}>
+          <Form>
             <Form.Item style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
               <h1>Choose your deliver method&nbsp;</h1>
             </Form.Item>
@@ -148,7 +150,7 @@ class DeliverForm extends Component {
             </div>
 
             <Form.Item style={{paddingTop: '15px'}}>
-              <Button type="primary" htmlType="submit" className="login-form-button" loading={this.state.loading}>
+              <Button type="primary" htmlType="submit" className="login-form-button" loading={this.state.loading} onClick={this.handleSubmit}>
                 Submit
               </Button>
 
