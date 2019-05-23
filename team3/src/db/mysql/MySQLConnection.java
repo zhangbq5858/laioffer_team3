@@ -342,7 +342,7 @@ public class MySQLConnection implements DBConnection{
 	            PreparedStatement stmt = conn.prepareStatement(sql);
 	            stmt.setDouble(1, robotJsonObject.getDouble("price"));
 	            stmt.setString(2, robotJsonObject.getString("appointment_time"));
-	            stmt.setString(2, Order.STATUS_INITIAL);
+	            stmt.setString(3, Order.STATUS_INITIAL);
 	            stmt.setString(4, input.getString("order_id"));
 	            return stmt.execute();
 	            

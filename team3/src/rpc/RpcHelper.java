@@ -40,9 +40,9 @@ public class RpcHelper {
 			
 			if(line.charAt(0) == '{') {  // request from postman json
 				StringBuilder sBuilder = new StringBuilder();
-				System.out.println("rpc input is json");
+//				System.out.println("rpc input is json");
 				while(line != null) {
-					System.out.println(line);
+//					System.out.println(line);
 					sBuilder.append(line);
 					line = reader.readLine();
 				}

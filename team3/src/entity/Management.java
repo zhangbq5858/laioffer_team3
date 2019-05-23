@@ -55,7 +55,7 @@ public class Management implements Runnable{
 		end.add(Calendar.HOUR_OF_DAY, robotWindowLength);
 		// 需要找到第一个window周期，使得window周期内order任务数小于robot数量
 		int orderCount = 0;
-		System.out.println("get next available time: current tasks : " + map.size());
+//		System.out.println("get next available time: current tasks : " + map.size());
 		for(Map.Entry<Calendar, Order> entry : map.entrySet()) {
 			if(entry.getKey().compareTo(end) > 0) {
 				if(orderCount < allRobotNumbers) {
@@ -137,10 +137,10 @@ public class Management implements Runnable{
 
 	@Override
 	public void run() {
-		 Thread land_tasks = new Thread(new assignWork(Robot.LAND_ROBOT));
-		 Thread uav_tasks = new Thread(new assignWork(Robot.UAV));
-		 land_tasks.run();
-		 uav_tasks.run();
+		Thread uav_tasks = new Thread(new assignWork(Robot.UAV));
+		Thread land_tasks = new Thread(new assignWork(Robot.LAND_ROBOT));
+		uav_tasks.run();
+		land_tasks.run();
 		
 	}
 	
