@@ -21,9 +21,9 @@ public class PriceUtils {
     		weightFee = (weight - 20) / 50 + 1;
     	}
         if (landRobot.equals(Robot.LAND_ROBOT)) {
-            timeFee = 1 * (int)(time) / 60;
+            timeFee = 0.3 * (int)(time) / 60;
         } else {
-            timeFee = 3 * (int)(time) / 60;
+            timeFee = 1 * (int)(time) / 60;
         }
         return timeFee * weightFee + packageFee;
     }
