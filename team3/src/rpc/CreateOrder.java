@@ -95,8 +95,9 @@ public class CreateOrder extends HttpServlet {
 	            JSONObject object = new JSONObject();
 	            Calendar appointmentTime = Management.getInstance().getNextAvailableTime(Robot.LAND_ROBOT);
 	            double time = EstimateTime.estimateTime(from_address, to_address, Robot.LAND_ROBOT);
+		    int minTime = EstimateTime.toMin(time);
 	            object.put("type", Robot.LAND_ROBOT);
-	            object.put("time", time);
+	            object.put("time", minTime);
 	            object.put("price", PriceUtils.price(time, Robot.LAND_ROBOT, jsonObject.getString("size"), 
 	            		Double.parseDouble(jsonObject.getString("weight"))));
 	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -108,8 +109,9 @@ public class CreateOrder extends HttpServlet {
 	            JSONObject object = new JSONObject();
 	            Calendar appointmentTime = Management.getInstance().getNextAvailableTime(Robot.UAV);
 	            double time = EstimateTime.estimateTime(from_address, to_address, Robot.UAV);
+		    int minTime = EstimateTime.toMin(time);
 	            object.put("type", Robot.UAV);
-	            object.put("time", time);
+	            object.put("time", minTime);
 	            object.put("price", PriceUtils.price(time, Robot.UAV, jsonObject.getString("size"), 
 	            		Double.parseDouble(jsonObject.getString("weight"))));
 	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
