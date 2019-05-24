@@ -98,14 +98,19 @@ class TrackingNum extends Component{
             </Form.Item>
           </Form.Item>
 
-          <Form.Item>
-            <Form.Item style={{ display: 'inline-block', width: 'calc(20% - 12px)' }}>
-              <h3>Expect Arrive Time&nbsp;&#58;</h3>
+          {
+            status !== "Delivered" ? (
+              <Form.Item>
+              <Form.Item style={{ display: 'inline-block', width: 'calc(20% - 12px)' }}>
+                <h3>Expect Arrive Time&nbsp;&#58;</h3>
+              </Form.Item>
+              <Form.Item style={{ display: 'inline-block', width: '40%' }}>
+                <span>{ expect_arrive_time }</span>
+              </Form.Item>
             </Form.Item>
-            <Form.Item style={{ display: 'inline-block', width: '40%' }}>
-              <span>{ expect_arrive_time }</span>
-            </Form.Item>
-          </Form.Item>
+            ) : ""
+          }
+
 
           <Form.Item>
             <Form.Item style={{ display: 'inline-block', width: 'calc(20% - 12px)' }}>
