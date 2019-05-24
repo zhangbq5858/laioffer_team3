@@ -1,5 +1,5 @@
 import React, { Component, Fragment} from 'react';
-import { Form, Input, Select, Button, Modal, } from 'antd';
+import { Form, Input, Select, Button, Modal, Icon} from 'antd';
 import axios from 'axios';
 import packageImg from '../package1.png';
 import {message} from 'antd/lib/index';
@@ -102,11 +102,17 @@ class DestinationForm extends Component{
           }),
         }).then(response => {
           if (response.status === 200) {
-            message.success("Save information successfully");
-            this.props.handleRobotInfo(response.data.order_id, response.data.robots, response.data.distance);
-            this.props.setPage("1");
-          } else {
-            this.showModal();
+            if (response.data.robots.length <= 0) {
+              this.showModal();
+              this.setState({
+                loading: !this.state.loading,
+                iconLoading: !this.state.iconLoading,
+              });
+            } else {
+              message.success("Save information successfully");
+              this.props.handleRobotInfo(response.data.order_id, response.data.robots);
+              this.props.setPage("1");
+            }
           }
           console.log(response);
         }).catch(err => {
@@ -345,7 +351,7 @@ class DestinationForm extends Component{
             <Form.Item
               label={(
                 <span>
-              Package Weight{' '}(lb)&nbsp;
+              Package Weight{' '}(lb) (&#8804; 80lb)&nbsp;
             </span>
               )}
               style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
@@ -354,7 +360,8 @@ class DestinationForm extends Component{
                 rules: [{
                   required: true, message: 'Please enter your package weight!'
                 }, {
-                  pattern: /(^[+]?([0-9]+(?:[\.][0-9]*)?|\.[0-9]+)$)/, message: 'Please input valid weight!'
+                  // pattern: /(^[+]?([0-9]+(?:[\.][0-9]*)?|\.[0-9]+)$)/, message: 'Please input valid weight!'
+                  pattern: /(^0*([1-9]|[1-7]\d|80)(\.\d+)*$)/, message: 'Please input valid weight and less than 80 lb!'
                 }],
               })(
                 <Input
@@ -556,17 +563,17 @@ class DestinationForm extends Component{
 
         <div>
         <Modal
-          title="oops..." 
-          visible={this.state.visible}
-          footer={[
-            <Button key="back" onClick={this.handleOk}>
-              ok
-            </Button>
-          ]}
-        >
-          <p>We do not have robots right now. Click ok to back the home page.</p>
-          <p>Sorry for inconvenience</p>
-        </Modal>
+            title="Cannot Finish The Order"
+            visible={this.state.visible}
+            footer={[
+              <Button key="back" onClick={this.handleOk}>
+                ok
+              </Button>
+            ]}
+          >
+            <p>Oops... The distance is too far, we cannot finish the order.<Icon type="frown" /></p>
+            <p>Click <b>ok</b> to go back Homepage</p>
+          </Modal>
       </div>
 
       </Fragment>

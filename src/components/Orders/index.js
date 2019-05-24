@@ -29,7 +29,6 @@ class Orders extends Component {
       current: 0,
       order_id: "",
       robots: [],
-      distance: "",
     };
   }
 
@@ -38,16 +37,15 @@ class Orders extends Component {
     this.setState({ current: Number(page) });
   }
 
-  handleRobotInfo = (order_id, robots, distance) => {
+  handleRobotInfo = (order_id, robots) => {
     this.setState({
       order_id,
       robots,
-      distance,
     })
   }
 
   getRobotInfo = () => {
-    return [this.state.order_id, this.state.robots, this.state.distance];
+    return [this.state.order_id, this.state.robots];
   }
 
   render() {
