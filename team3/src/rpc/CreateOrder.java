@@ -1,6 +1,7 @@
 package rpc;
 
 import db.cloudsql.CloudSQLConnection;
+import db.mysql.MySQLConnection;
 import entity.Address;
 import entity.Management;
 import entity.Order;
@@ -94,32 +95,33 @@ public class CreateOrder extends HttpServlet {
             if (true) {
 	            JSONObject object = new JSONObject();
 	            Calendar appointmentTime = Management.getInstance().getNextAvailableTime(Robot.LAND_ROBOT);
-	            double time = EstimateTime.estimateTime(from_address, to_address, Robot.LAND_ROBOT);
-		    int minTime = EstimateTime.toMin(time);
-	            object.put("type", Robot.LAND_ROBOT);
-	            object.put("time", minTime);
-	            object.put("price", PriceUtils.price(time, Robot.LAND_ROBOT, jsonObject.getString("size"), 
-	            		Double.parseDouble(jsonObject.getString("weight"))));
-	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	            object.put("appointment_time", sdf.format(appointmentTime.getTime()));
-	            robots_json.put(object);
+	            double time = shortestTime(from_address, to_address, Robot.LAND_ROBOT);
+	            if(time <= 4 * 60) {
+		            object.put("type", Robot.LAND_ROBOT);
+		            object.put("time", time);
+		            object.put("price", PriceUtils.price(time, Robot.LAND_ROBOT, jsonObject.getString("size"), 
+		            		Double.parseDouble(jsonObject.getString("weight"))));
+		            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		            object.put("appointment_time", sdf.format(appointmentTime.getTime()));
+		            robots_json.put(object);
+	            }
             }
             
             if (true) {
 	            JSONObject object = new JSONObject();
 	            Calendar appointmentTime = Management.getInstance().getNextAvailableTime(Robot.UAV);
-	            double time = EstimateTime.estimateTime(from_address, to_address, Robot.UAV);
-		    int minTime = EstimateTime.toMin(time);
-	            object.put("type", Robot.UAV);
-	            object.put("time", minTime);
-	            object.put("price", PriceUtils.price(time, Robot.UAV, jsonObject.getString("size"), 
-	            		Double.parseDouble(jsonObject.getString("weight"))));
-	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	            object.put("appointment_time", sdf.format(appointmentTime.getTime()));
-	            robots_json.put(object);
+	            double time =  shortestTime(from_address, to_address, Robot.UAV);
+	            if(time <= 4 * 60) {
+		            object.put("type", Robot.UAV);
+		            object.put("time", time);
+		            object.put("price", PriceUtils.price(time, Robot.UAV, jsonObject.getString("size"), 
+		            		Double.parseDouble(jsonObject.getString("weight"))));
+		            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		            object.put("appointment_time", sdf.format(appointmentTime.getTime()));
+		            robots_json.put(object);
+	            }
             }
 
-            
             JSONObject order_json = new JSONObject();
             order_json.put("order_id", order.getOrderId());
             order_json.put("distance", DistanceUtils.getStraightDistance(from_address, to_address));
@@ -131,6 +133,22 @@ public class CreateOrder extends HttpServlet {
         } finally {
             dbConnection.close();
         }
+    }
+    
+    private double shortestTime(Address fromAddress, Address toAddress, String type) {
+    	double time = 5 * 60;
+    	DBConnection connection = new MySQLConnection();
+    	// check the whole three branch
+    	for(int i = 1; i <= 3; i++) {
+    		double tmpTime = 0;
+    		Address branchAddress = Address.parse(connection.getBranchAddress(i));
+    		tmpTime += EstimateTime.estimateTime(branchAddress, fromAddress, type);
+    		tmpTime += EstimateTime.estimateTime(fromAddress, toAddress, type);
+    		tmpTime += EstimateTime.estimateTime(toAddress, branchAddress, type);
+    		System.out.println("createOrder calculate shortest time from branch " + i + " is " + tmpTime + " mins.");
+    		time = Math.min(time, tmpTime);
+    	}
+    	return time;
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

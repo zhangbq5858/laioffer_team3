@@ -10,7 +10,7 @@ public class Address {
     private String zipcode;
 
     public Address(JSONObject address) {
-
+    
     }
 
     public String getStreet() {

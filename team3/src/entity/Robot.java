@@ -35,6 +35,7 @@ import util.EstimateTime;
 
 public class Robot implements Runnable{
 //	public static final String ADDINGWORK = "addingWORK";
+	public static final int demoWaitMinute = 1;
 	public static final String PICKING = "picking";
 	public static final String SENDING = "sending";
 	public static final String PICKED = "picked";
@@ -198,10 +199,10 @@ public class Robot implements Runnable{
 	}
 	// TODO monitor geolocation changing
 	private void pickPackage() throws InterruptedException {
-		System.out.println("prepare to pick package");
-		int timeInSecond = (int)EstimateTime.estimateTime(getBranchAddress(), getCurrentOrder().getFromAddress());
+		int timeInMinute = (int)EstimateTime.estimateTime(getBranchAddress(), getCurrentOrder().getFromAddress(), type);
+		System.out.println("prepare to pick package. Estimate time is " + timeInMinute + " minutes.");
 		setStatus(PICKING);
-		Thread.sleep(timeInSecond * 1000);
+		Thread.sleep(demoWaitMinute * 1000 * 60);
 		remainderSender();
 		setStatus(PICKED);
 		report();
@@ -209,21 +210,21 @@ public class Robot implements Runnable{
 	
 	// TODO monitor geolocation changing
 	private void sendPackage() throws InterruptedException {
-		System.out.println("prepare to send package");
-		int timeInSecond = (int)EstimateTime.estimateTime(getCurrentOrder().getFromAddress(), getCurrentOrder().getToAddress());
+		int timeInMinute = (int)EstimateTime.estimateTime(getCurrentOrder().getFromAddress(), getCurrentOrder().getToAddress(), type);
+		System.out.println("prepare to send package. Estimate time is " + timeInMinute + " minutes.");
 		setStatus(SENDING);
-		Thread.sleep(timeInSecond * 1000);
+		Thread.sleep(demoWaitMinute * 1000 * 60);
 		remainderReceiver();
 		setStatus(RECEIVED);
 		report();
 	}
 	
 	private void goBack() throws InterruptedException {
-		System.out.println("prepare to go back to branch");
-		int timeInSecond = (int)EstimateTime.estimateTime(getCurrentOrder().getToAddress(), getBranchAddress());
+		int timeInMinute = (int)EstimateTime.estimateTime(getCurrentOrder().getToAddress(), getBranchAddress(), type);
+		System.out.println("prepare to go back to branch. Estimate time is " + timeInMinute + " minutes.");
 		setCurrentOrder(null);
 		setStatus(GOING_BACK);
-		Thread.sleep(timeInSecond * 1000);
+		Thread.sleep(demoWaitMinute * 60 * 1000);
 		setStatus(IN_BRANCH);
 		report();
 	}

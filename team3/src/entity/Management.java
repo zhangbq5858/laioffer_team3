@@ -13,6 +13,7 @@ import database.DBConnectionFactory;
 import jnr.ffi.Struct.int16_t;
 
 public class Management implements Runnable{
+	public static final Integer ROBOTREPORTINTERVAL = 10 * 1000;
 	private static Management instance;
 	private TreeMap<Calendar, Order> allLandTasks;
 	private TreeMap<Calendar, Order> allUAVTasks;
@@ -109,7 +110,7 @@ public class Management implements Runnable{
 						} else {
 							Integer robotId = availableRobots.get(0);
 							//创建模拟机器人 并分配任务
-							Robot robot = new Robot(robotId, 5000);
+							Robot robot = new Robot(robotId, ROBOTREPORTINTERVAL);
 				            robot.addWork(entry.getValue());
 				            // 更新order订单信息 提供robotid
 				            dbConnection.updateOrder(entry.getValue().getOrderId(), robotId);

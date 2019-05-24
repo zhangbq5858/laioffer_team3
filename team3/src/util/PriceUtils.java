@@ -7,7 +7,7 @@ public class PriceUtils {
     public static double price(double time, String landRobot, String size, double weight) {
     	double packageFee = 0;
     	double timeFee = 0;
-    	double weightFee = 0;
+    	double weightFee = 1;
     	if(size.equals("compact")) {
     		packageFee = 3;
     	} else if (size.equals("premium")) {
@@ -21,9 +21,9 @@ public class PriceUtils {
     		weightFee = (weight - 20) / 50 + 1;
     	}
         if (landRobot.equals(Robot.LAND_ROBOT)) {
-            timeFee = 0.3 * (int)(time) / 60;
+            timeFee = 0.15 * time;
         } else {
-            timeFee = 1 * (int)(time) / 60;
+            timeFee = 0.75 * time;
         }
         return timeFee * weightFee + packageFee;
     }

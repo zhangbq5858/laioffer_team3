@@ -73,7 +73,7 @@ public class MySQLInitData {
 	
 	private static void insertRobotData(Connection conn) throws SQLException {
 		// 200 land_robot	
-		int lrNumber = 1;
+		int lrNumber = 10;
 		String sql = "INSERT INTO robots(branch_id, type) VALUES(?, ?)";
 		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setString(2, Robot.LAND_ROBOT);

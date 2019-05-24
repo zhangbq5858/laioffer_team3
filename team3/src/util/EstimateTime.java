@@ -16,6 +16,8 @@ import static entity.Robot.LAND_ROBOT;
 import static entity.Robot.UAV;
 
 public class EstimateTime {
+	
+	private static final double UAVSPEED = 10.8; // 10.8m /s
     // TODO: please use this to estimate time!!!!!!!!!!!!!!!
     // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -23,7 +25,7 @@ public class EstimateTime {
      * @param fromAddress
      * @param toAddress
      * @param robotType
-     * @return time (unit: seconds)
+     * @return time (unit: minutes)
      */
     public static double estimateTime(Address fromAddress, Address toAddress, String robotType) {
         double time = -1;
@@ -32,43 +34,25 @@ public class EstimateTime {
                 time = DistanceUtils.getRouteDistanceAndTime(fromAddress, toAddress)[1];
                 break;
             case UAV:
-                time = estimateTime(fromAddress, toAddress, 10); // TODO: speed = 10???????
+                time = estimateTime(fromAddress, toAddress, UAVSPEED);
                 break;
             default:
                 System.err.println("Wrong type!!!!!!!!!!!!!!!!");
         }
-
-        // TODO: use this to indicate the time when it is over 2 hours
-        if (time > 4 * 60 * 60) {
-            return -1;
-        }
-
-        return time;
+        return toMin(time);
     }
 
-    public static double estimateTime(Address fromAddress, Address toAddress, int speed) {
+    public static double estimateTime(Address fromAddress, Address toAddress, double speed) {
         //TODO
         //Optimize in the future
         double distance = DistanceUtils.getDistance(fromAddress, toAddress);
         return distance / speed;
     }
 
-    // TODO estimate time for land_robot in unit s;
-    public static double estimateTime(Address fromAddress, Address toAddress) {
-        //TODO
-        //Optimize in the future
-        return 20;
-    }
-
-    // TODO estimate time for land_robot in unit s;
-    public static double estimateTime(GeoLocation fromAddress, GeoLocation toAddress) {
-        //TODO
-        //Optimize in the future
-        return 20;
-    }
 
     public static int toMin(double time) {
         return (int) time / 60;
+        
     }
 
     public static String prettify(double time) {
@@ -78,20 +62,19 @@ public class EstimateTime {
     }
 
     public static void main(String[] args) {
-        Address fromAddress = new Address.AddressBuilder().setStreet("254 Davis St").setCity("Seattle").build();
-        Address toAddress = new Address.AddressBuilder().setCity("San Francisco").build();
+        Address fromAddress = new Address.AddressBuilder().setStreet("Scott St Duboce Ave").setCity("San Francisco").build();
+        Address toAddress = new Address.AddressBuilder().setStreet("Museum Way Roosevelt Way").setCity("San Francisco").build();
 
         System.out.println("Route Time:");
         double time1 = estimateTime(fromAddress, toAddress, LAND_ROBOT);
-        System.out.println(time1);
-        System.out.println(toMin(time1) + " min");
+        System.out.println(time1 + " min");
         System.out.println(prettify(time1));
 
         System.out.println("\nDirect Time:");
         double time2 = estimateTime(fromAddress, toAddress, UAV);
-        System.out.println(time2);
-        System.out.println(toMin(time2) + " min");
+        System.out.println(time2 + " min");
         System.out.println(prettify(time2));
+    
 
 //        Route Time:
 //        Response Code: 200

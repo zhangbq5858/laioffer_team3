@@ -41,7 +41,7 @@ public class DistanceUtils {
                 fromAddress.encode(),
                 toAddress.encode(),
                 API_KEY);
-
+//        System.out.println("route distance query: " + query);
         // https://maps.googleapis.com/maps/api/distancematrix/json?origins=Vancouver+BC|Seattle&destinations=San+Francisco|Victoria+BC&mode=bicycling&language=fr-FR&key=YOUR_API_KEY
         String url = URL + DISTANCEMATRIX + OUTPUT_FORMAT + "?" + query;
 
@@ -50,7 +50,7 @@ public class DistanceUtils {
             connection.setRequestMethod("GET");
 
             int responseCode = connection.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
+//            System.out.println("Response Code: " + responseCode);
 
             if (responseCode != 200) {
                 return new double[] {-1, -1}; // indicate fail
@@ -64,6 +64,7 @@ public class DistanceUtils {
             while ((line = reader.readLine()) != null) {
                 response.append(line);
             }
+//            System.out.println("Google map Response : " + response);
 
             reader.close();
             JSONObject object = new JSONObject(response.toString());
@@ -202,7 +203,7 @@ public class DistanceUtils {
             connection.setRequestMethod("GET");
 
             int responseCode = connection.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
+//            System.out.println("Response Code: " + responseCode);
 
             if (responseCode != 200) {
                 return null; // indicate fail

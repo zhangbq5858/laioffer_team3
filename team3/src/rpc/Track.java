@@ -47,10 +47,17 @@ public class Track extends HttpServlet {
 			JSONObject input = RpcHelper.readJSONObject(request);
 			String orderId = input.getString("order_id");
 			DBConnection dbConnection = new DBConnectionFactory().getConnection();
-			JSONObject status = dbConnection.getOrderStatus(orderId);
 			
-			if(status.isNull("status")) {
+			JSONObject status = dbConnection.getOrderStatus(orderId);
+			if(status.isNull("status") || status.getString("status").equals(Order.STATUS_TEMPORARY)) {
 				status.put("status", "Invalid Order Number");
+		    	RpcHelper.writeJsonObject(response, status);
+		    	return;
+			}
+			
+			if(status.getInt("robot_id") == 0) {
+//				System.out.println("track rpc find order is in process");
+				status.put("status", "In Process");
 		    	RpcHelper.writeJsonObject(response, status);
 		    	return;
 			}
@@ -68,11 +75,6 @@ public class Track extends HttpServlet {
 			}
 			//not delivered, fetch current geoLocation from robot table
 			else if (!status.getString("status").equals(Order.STATUS_TEMPORARY)){
-				if(status.isNull("robot_id")) {
-					status.put("status", "In Process");
-			    	RpcHelper.writeJsonObject(response, status);
-			    	return;
-				}
 				Integer robotId = status.getInt("robot_id");
 				//TODO get address by use robot geolocation to calculate the Address
 				JSONObject robotInformation = dbConnection.getRobotInformation(robotId);

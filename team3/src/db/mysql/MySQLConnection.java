@@ -5,7 +5,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +60,7 @@ public class MySQLConnection implements DBConnection{
 	                String status = rs.getString("status");
 	                Integer from_address_id = rs.getInt("from_address_id");
 	                Integer to_address_id = rs.getInt("to_address_id");
-//	                System.out.println("track order information with to address id: " + to_address_id);
 	                Integer robot_id = rs.getInt("robot_id");
-
 	                JSONObject fromAddress = getAddress(from_address_id);
 	                JSONObject toAddress = getAddress(to_address_id);
 
@@ -339,12 +340,20 @@ public class MySQLConnection implements DBConnection{
 		    		throw new FileNotFoundException("No connection to database");
 	        	// create from_address and to_address first;
 	        	JSONObject robotJsonObject = input.getJSONArray("robot").getJSONObject(0);
-	            String sql = "UPDATE orders SET price = ?, appointment_time = ?, status = ?  WHERE order_id = ?;";
+	            String sql = "UPDATE orders SET price = ?, appointment_time = ?, status = ?, expect_arrive_time = ? WHERE order_id = ?;";
 	            PreparedStatement stmt = conn.prepareStatement(sql);
 	            stmt.setDouble(1, robotJsonObject.getDouble("price"));
 	            stmt.setString(2, robotJsonObject.getString("appointment_time"));
 	            stmt.setString(3, Order.STATUS_INITIAL);
-	            stmt.setString(4, input.getString("order_id"));
+	            //update epect arrive time
+	            String time = robotJsonObject.getString("appointment_time");
+	            SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	            Date date =sdf.parse(time);
+	            Calendar arriveTime = Calendar.getInstance();
+	            arriveTime.setTime(date);
+	            arriveTime.add(Calendar.MINUTE, robotJsonObject.getInt("time"));
+	            stmt.setString(4,  sdf.format(arriveTime.getTime()));
+	            stmt.setString(5, input.getString("order_id"));
 	            return stmt.execute();
 	            
 	        } catch (Exception e) {
