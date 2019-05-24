@@ -12,7 +12,8 @@ class DeliverForm extends Component {
       order_id: "",
       distance: "",
       robots: [],
-      visible: false,
+      visible1: false,
+      visible2: false,
       loading: false,
       iconLoading: false,
     }
@@ -21,40 +22,49 @@ class DeliverForm extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        const selectRobot = this.props.getRobotInfo()[1].filter(ele => ele["type"] === values.robot);
-        console.log(selectRobot);
-        console.log(this.props.getRobotInfo()[0]);
-        axios({
-          method: 'POST',
-          url:'/confirmOrder',
-          data: JSON.stringify({
-            order_id: this.props.getRobotInfo()[0],
-            robot: selectRobot,
-          }),
-        }).then(response => {
-          if (response.status === 200) {
-            message.success("Make order successfully! Thanks");
-            this.props.setPage("2");
-          } else {
-            message.error("oop! something wrong");
-            this.props.history.push(`/`)
-          }
-          console.log(response);
-        }).catch(err => {
-          console.log(err);
-        });
+      if (this.props.getRobotInfo()[2] === "-1") {
+        this.showModal2();
+      } else {
+        if (!err) {
+          const selectRobot = this.props.getRobotInfo()[1].filter(ele => ele["type"] === values.robot);
+          axios({
+            method: 'POST',
+            url:'/confirmOrder',
+            data: JSON.stringify({
+              order_id: this.props.getRobotInfo()[0],
+              robot: selectRobot,
+            }),
+          }).then(response => {
+            if (response.status === 200) {
+              message.success("Make order successfully! Thanks");
+              this.props.setPage("2");
+            } else {
+              message.error("oop! something wrong");
+              this.props.history.push(`/`)
+            }
+            console.log(response);
+          }).catch(err => {
+            console.log(err);
+          });
+          this.setState({
+            loading: !this.state.loading,
+            iconLoading: !this.state.iconLoading,
+          });
+        }
       }
-      this.setState({
-        loading: !this.state.loading,
-        iconLoading: !this.state.iconLoading,
-      });
+
     });
   }
 
-  showModal = () => {
+  showModal1 = () => {
     this.setState({
-      visible: true,
+      visible1: true,
+    });
+  };
+
+  showModal2 = () => {
+    this.setState({
+      visible2: true,
     });
   };
 
@@ -78,18 +88,25 @@ class DeliverForm extends Component {
       console.log(err);
     });
     this.setState({
-      visible: false,
+      visible1: false,
     });
   };
 
-  handleCancel = e => {
+  handleCancel1 = e => {
     this.setState({
-      visible: false,
+      visible1: false,
     });
+  };
+
+  handleCancel2 = e => {
+    this.setState({
+      visible2: false,
+    });
+    this.props.history.push(`/`);
   };
 
   render() {
-
+    // console.log(this.props.getRobotInfo()[2]);
     const { getFieldDecorator } = this.props.form;
     let radioUI = (<h1>Sorry, no available deliver robot right now, please try it later</h1>);
     const columns = [{
@@ -154,7 +171,7 @@ class DeliverForm extends Component {
                 Submit
               </Button>
 
-              <Button onClick={this.showModal} type="danger" htmlType="submit" className="login-form-button" style={{marginLeft: '40px'}}>
+              <Button onClick={this.showModal1} type="danger" htmlType="submit" className="login-form-button" style={{marginLeft: '40px'}}>
                 Cancel
               </Button>
             </Form.Item>
@@ -162,11 +179,24 @@ class DeliverForm extends Component {
 
           <Modal
             title="Cancel Order"
-            visible={this.state.visible}
+            visible={this.state.visible1}
             onOk={this.handleOk}
-            onCancel={this.handleCancel}
+            onCancel={this.handleCancel1}
           >
             <p>Do you want to cancel these order? <Icon type="frown" /></p>
+          </Modal>
+
+          <Modal
+            title="Cannot Finish The Order"
+            visible={this.state.visible2}
+            footer={[
+              <Button key="back" onClick={this.handleCancel2}>
+                ok
+              </Button>
+            ]}
+          >
+            <p>Oops... The distance is too far, we cannot finish the order.<Icon type="frown" /></p>
+            <p>Click <b>ok</b> to go back Homepage</p>
           </Modal>
         </div>
       );

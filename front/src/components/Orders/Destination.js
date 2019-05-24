@@ -1,7 +1,8 @@
 import React, { Component, Fragment} from 'react';
 import { Form, Input, Select, Button, Modal, } from 'antd';
 import axios from 'axios';
-import {message} from 'antd/lib/index'
+import packageImg from '../package1.png';
+import {message} from 'antd/lib/index';
 
 const { Option } = Select;
 
@@ -77,6 +78,7 @@ class DestinationForm extends Component{
         });
 
         this.setState({ iconLoading: true });
+        console.log(values);
         axios({
           method: 'POST',
           url:'/createOrder',
@@ -94,14 +96,14 @@ class DestinationForm extends Component{
               zipcode: values.zip,
             },
             sender_email: values.email,
-            receiver_email: values.emailTo
+            receiver_email: values.emailTo,
+            weight: values.weight,
+            size: values.size
           }),
         }).then(response => {
           if (response.status === 200) {
-            var data = JSON.parse(response.request.response);
-            console.log("createOrder response: ", data);
-            // console.log("mock_data: ", mock_data);
-            this.props.handleRobotInfo(data.order_id, data.robots);
+            message.success("Save information successfully");
+            this.props.handleRobotInfo(response.data.order_id, response.data.robots, response.data.distance);
             this.props.setPage("1");
           } else {
             this.showModal();
@@ -129,7 +131,7 @@ class DestinationForm extends Component{
           <Form.Item
             className="form-title"
           >
-            <h1>Enter your Destination Info</h1>
+            <h1>Enter Your Destination & Package Info</h1>
           </Form.Item>
 
           <Form.Item
@@ -222,7 +224,7 @@ class DestinationForm extends Component{
                 rules: [{ required: true, message: 'Please input your state!' }],
               })(
                 <Select
-                  placeholder="Select one State"
+                  placeholder="Select One State"
                   style={{ display: 'inline-block', width: '100%' }}
                   onChange={this.handleChange("to_address.state")}
                 >
@@ -304,6 +306,62 @@ class DestinationForm extends Component{
                   style={{ display: 'inline-block', width: '100%' }}
                 />
               )}
+            </Form.Item>
+          </Form.Item>
+
+          <Form.Item>
+            <div>
+              <img src={packageImg} style={{display: 'block', margin: 'auto', width: '70%', height: '70%'}}/>
+            </div>
+          </Form.Item>
+
+          <Form.Item
+            style={{ marginBottom: 0 }}
+          > 
+            <Form.Item
+              label={(
+                <span>
+              Package Size&nbsp;
+            </span>
+              )}
+              style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+            >
+              {getFieldDecorator('size', {
+                rules: [{ required: true, message: 'Please select your package size!' }],
+              })(
+                <Select
+                placeholder="Select The Package Size"
+                style={{ display: 'inline-block', width: '100%' }}
+                onChange={this.handleChange("to_address.state")}
+              >
+                <Option key="compact" value="compact">{'Compact 35x55x35 cm'}</Option>
+                <Option key="premium" value="premium">{'Premium 37x55x63 cm'}</Option>
+                <Option key="cube" value="cube">{'cube 55x60x60 cm'}</Option>
+                <Option key="super_value" value="super_value">{'Compact 55x73x63 cm'}</Option>   
+              </Select>
+              )}
+            </Form.Item>
+            <span style={{ display: 'inline-block', width: '24px', textAlign: 'center' }}></span>
+            <Form.Item
+              label={(
+                <span>
+              Package Weight{' '}(lb)&nbsp;
+            </span>
+              )}
+              style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+            >
+              {getFieldDecorator('weight', {
+                rules: [{
+                  required: true, message: 'Please enter your package weight!'
+                }, {
+                  pattern: /(^[+]?([0-9]+(?:[\.][0-9]*)?|\.[0-9]+)$)/, message: 'Please input valid weight!'
+                }],
+              })(
+                <Input
+                  style={{ display: 'inline-block', width: '100%' }}
+                />
+              )}
+
             </Form.Item>
           </Form.Item>
 
