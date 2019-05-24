@@ -18,8 +18,8 @@ import static entity.Robot.UAV;
 public class EstimateTime {
     // TODO: please use this to estimate time!!!!!!!!!!!!!!!
     // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     /**
-     *
      * @param fromAddress
      * @param toAddress
      * @param robotType
@@ -36,6 +36,11 @@ public class EstimateTime {
                 break;
             default:
                 System.err.println("Wrong type!!!!!!!!!!!!!!!!");
+        }
+
+        // TODO: use this to indicate the time when it is over 2 hours
+        if (time > 4 * 60 * 60) {
+            return -1;
         }
 
         return time;
@@ -68,8 +73,8 @@ public class EstimateTime {
 
     public static String prettify(double time) {
         int min = toMin(time);
-        int hour = min/60;
-        return hour + " hour(s) and " + min%60 + " min(s)";
+        int hour = min / 60;
+        return hour + " hour(s) and " + min % 60 + " min(s)";
     }
 
     public static void main(String[] args) {
