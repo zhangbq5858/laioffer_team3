@@ -22,37 +22,32 @@ class DeliverForm extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
-      if (this.props.getRobotInfo()[2] === "-1") {
-        this.showModal2();
-      } else {
-        if (!err) {
-          const selectRobot = this.props.getRobotInfo()[1].filter(ele => ele["type"] === values.robot);
-          axios({
-            method: 'POST',
-            url:'/confirmOrder',
-            data: JSON.stringify({
-              order_id: this.props.getRobotInfo()[0],
-              robot: selectRobot,
-            }),
-          }).then(response => {
-            if (response.status === 200) {
-              message.success("Make order successfully! Thanks");
-              this.props.setPage("2");
-            } else {
-              message.error("oop! something wrong");
-              this.props.history.push(`/`)
-            }
-            console.log(response);
-          }).catch(err => {
-            console.log(err);
-          });
-          this.setState({
-            loading: !this.state.loading,
-            iconLoading: !this.state.iconLoading,
-          });
-        }
+      if (!err) {
+        const selectRobot = this.props.getRobotInfo()[1].filter(ele => ele["type"] === values.robot);
+        axios({
+          method: 'POST',
+          url:'/confirmOrder',
+          data: JSON.stringify({
+            order_id: this.props.getRobotInfo()[0],
+            robot: selectRobot,
+          }),
+        }).then(response => {
+          if (response.status === 200) {
+            message.success("Make order successfully! Thanks");
+            this.props.setPage("2");
+          } else {
+            message.error("oop! something wrong");
+            this.props.history.push(`/`)
+          }
+          console.log(response);
+        }).catch(err => {
+          console.log(err);
+        });
+        this.setState({
+          loading: !this.state.loading,
+          iconLoading: !this.state.iconLoading,
+        });
       }
-
     });
   }
 
@@ -98,17 +93,9 @@ class DeliverForm extends Component {
     });
   };
 
-  handleCancel2 = e => {
-    this.setState({
-      visible2: false,
-    });
-    this.props.history.push(`/`);
-  };
-
   render() {
-    // console.log(this.props.getRobotInfo()[2]);
     const { getFieldDecorator } = this.props.form;
-    let radioUI = (<h1>Sorry, no available deliver robot right now, please try it later</h1>);
+    let radioUI = (<h1>Sorry, The address you filled in is beyond our service area. We currently only offer service in San Francisco, Kentfield, and San Leandro.</h1>);
     const columns = [{
       title: 'Type',
       dataIndex: 'type',
@@ -186,18 +173,6 @@ class DeliverForm extends Component {
             <p>Do you want to cancel these order? <Icon type="frown" /></p>
           </Modal>
 
-          <Modal
-            title="Cannot Finish The Order"
-            visible={this.state.visible2}
-            footer={[
-              <Button key="back" onClick={this.handleCancel2}>
-                ok
-              </Button>
-            ]}
-          >
-            <p>Oops... The distance is too far, we cannot finish the order.<Icon type="frown" /></p>
-            <p>Click <b>ok</b> to go back Homepage</p>
-          </Modal>
         </div>
       );
     }
